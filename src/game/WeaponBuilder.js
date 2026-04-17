@@ -230,8 +230,8 @@ export function buildWeapon(type = 'pistol') {
     add(new THREE.CylinderGeometry(0.008, 0.008, 0.16, 8), darkMetal, [0.3, -0.06, -0.04], [0.3, 0, 0]);
   }
 
-  // Rotate the geometry 90 degrees so +X becomes -Z (forward)
-  innerGroup.rotation.y = Math.PI / 2;
+  // Rotate the geometry -90 degrees so +X becomes -Z (forward)
+  innerGroup.rotation.y = -Math.PI / 2;
   outerGroup.add(innerGroup);
 
   return outerGroup;

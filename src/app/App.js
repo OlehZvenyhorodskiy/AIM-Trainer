@@ -283,7 +283,7 @@ export class App {
   renderLanding() {
     const items = [
       { action: 'goto-select', label: this.i18n.t('nav.play') },
-      { action: 'open-scenario', extra: 'data-scenario-id="101"', label: 'Find Perfect Sens' },
+      { action: 'goto-sens-finder', label: 'Sensitivity Finder' },
       { action: 'goto-leaderboard', label: this.i18n.t('nav.leaderboard') },
       { action: 'goto-settings', label: this.i18n.t('nav.settings') },
       { action: 'goto-profile', label: this.i18n.t('nav.profile') },
@@ -967,6 +967,13 @@ export class App {
         break;
       case 'back-menu':
         this.setScreen('landing');
+        break;
+      case 'goto-sens-finder':
+        this.setScreen('lobby', {
+          selectedScenarioId: 101,
+          lobbyWeapon: null,
+          lobbyTheme: null,
+        });
         break;
       case 'open-scenario': {
         const scenarioId = Number(target.dataset.scenarioId);

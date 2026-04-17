@@ -476,8 +476,8 @@ select.input {
 }
 
 select option {
-  background: var(--bg-deep, #08090d);
-  color: var(--text-primary, #f0f0f0);
+  background: #111318 !important;
+  color: #ffffff !important;
 }
 
 .color-input {
@@ -513,8 +513,8 @@ select option {
 }
 
 .language-pill select option {
-  background: var(--bg-deep, #08090d);
-  color: var(--text-primary, #f0f0f0);
+  background: #111318 !important;
+  color: #ffffff !important;
 }
 
 /* ─── Toolbar (filters bar on scenario select) ───────────────── */

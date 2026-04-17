@@ -4,6 +4,11 @@ import { ParticlePool } from './ParticlePool.js';
 import { createBot } from './BotFactory.js';
 import { applyCrosshairStyles, createCrosshairMarkup } from './crosshair.js';
 import { buildWeapon, WEAPON_STATS } from './WeaponBuilder.js';
+import { RecoilSystem } from './RecoilSystem.js';
+import { SensitivityOptimizer } from './SensitivityOptimizer.js';
+import { AdaptiveDifficultyController } from './AdaptiveDifficultyController.js';
+import { ADVANCED_SENSITIVITY_PHASES } from '../data/advancedSensitivityPhases.js';
+import { FlickPathAnalyzer } from './FlickPathAnalyzer.js';
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -274,6 +279,8 @@ export class GameEngine {
     this.reloading = false;
     this.reloadEndAt = 0;
     this.recoilKick = 0;
+    this.recoilSystem = new RecoilSystem();
+    this.recoilSystem.setWeapon(this.currentWeaponType);
     this.scoreDisplay = 0;
     this.fps = 0;
     this.fpsAccumulator = 0;
@@ -305,13 +312,8 @@ export class GameEngine {
       0.05,
       5,
     );
-    const coarsePhases = this.buildSensitivityPhaseSet(
-      SENSITIVITY_COARSE_PHASES,
-      dpi,
-      initialValorantSensitivity,
-    );
-    const refinePhases = this.buildSensitivityPhaseSet(
-      SENSITIVITY_REFINE_PHASES,
+    const phases = this.buildSensitivityPhaseSet(
+      ADVANCED_SENSITIVITY_PHASES,
       dpi,
       initialValorantSensitivity,
     );
@@ -319,10 +321,10 @@ export class GameEngine {
     return {
       dpi,
       initialValorantSensitivity,
-      provisionalAt: 180,
-      coarsePhaseCount: coarsePhases.length,
+      provisionalAt: 1000, // disables provisional re-centering, doing all phases in one go
+      coarsePhaseCount: phases.length,
       phaseIndex: -1,
-      phases: [...coarsePhases, ...refinePhases],
+      phases,
       phaseStartedAt: 0,
       phaseStartStats: null,
       phaseResults: [],
@@ -330,41 +332,12 @@ export class GameEngine {
       refinementCenter: initialValorantSensitivity,
       provisionalRecommendation: null,
       finalRecommendation: null,
+      adaptiveController: null,
     };
   }
 
-  buildSensitivityPhaseSet(templates, dpi, centerSensitivity) {
-    return templates.map((template) => {
-      const valorantSensitivity = roundTo(
-        clamp(centerSensitivity * template.relativeSensitivity, 0.05, 5),
-      );
-
-      return {
-        ...template,
-        config: { ...template.config },
-        valorantSensitivity,
-        siteSensitivity: roundTo(
-          valorantSensitivityToSite(dpi, valorantSensitivity),
-          2,
-        ),
-      };
-    });
-  }
-
   configureSensitivityRefinement(centerSensitivity) {
-    if (!this.sensitivityFinder) return;
-    const clampedCenter = clamp(centerSensitivity, 0.05, 5);
-    const refinePhases = this.buildSensitivityPhaseSet(
-      SENSITIVITY_REFINE_PHASES,
-      this.sensitivityFinder.dpi,
-      clampedCenter,
-    );
-
-    this.sensitivityFinder.phases = [
-      ...this.sensitivityFinder.phases.slice(0, this.sensitivityFinder.coarsePhaseCount),
-      ...refinePhases,
-    ];
-    this.sensitivityFinder.refinementCenter = clampedCenter;
+    // Deprecated with advanced phases
   }
 
   getAimAnglesForPosition(position) {
@@ -434,6 +407,17 @@ export class GameEngine {
         ? target.telemetry.errorSum / target.telemetry.errorSamples
         : target.telemetry.bestAngularError,
     });
+
+    if (this.sensitivityFinder.adaptiveController) {
+      const adaptedParams = this.sensitivityFinder.adaptiveController.feedEvent(
+        resolvedWithHit,
+        acquireTime,
+        target.telemetry.initialAngularError
+      );
+      if (adaptedParams) {
+        Object.assign(this.scenario, adaptedParams);
+      }
+    }
   }
 
   scoreSensitivityPhase(phase, phaseStats, targetMetrics) {
@@ -683,6 +667,7 @@ export class GameEngine {
 
   initThree() {
     this.scene = new THREE.Scene();
+    this.flickAnalyzer = new FlickPathAnalyzer(this.scene);
     this.camera = new THREE.PerspectiveCamera(
       this.settings.display.fov,
       this.viewport.clientWidth / this.viewport.clientHeight,
@@ -779,11 +764,18 @@ export class GameEngine {
     this.scenario = {
       ...this.baseScenario,
       ...phase.config,
-      duration: this.baseScenario.duration,
+      duration: phase.duration,
       totalTargets: 999,
       sensitivityFinder: true,
       title: this.baseScenario.title,
     };
+    
+    if (phase.adaptive) {
+      this.sensitivityFinder.adaptiveController = new AdaptiveDifficultyController(this.scenario);
+    } else {
+      this.sensitivityFinder.adaptiveController = null;
+    }
+
     this.settings.input.sensitivity = phase.siteSensitivity;
     this.setWeaponType(this.scenario.weapon || this.currentWeaponType);
     this.clearTargets();
@@ -841,64 +833,9 @@ export class GameEngine {
 
   getSensitivityRecommendation(results) {
     if (!results.length) return null;
+    const rec = SensitivityOptimizer.analyze(results, this.sensitivityFinder.dpi);
+    if (!rec) return null;
 
-    const grouped = new Map();
-    results.forEach((result) => {
-      const key = result.valorantSensitivity.toFixed(3);
-      const entry = grouped.get(key) ?? {
-        valorantSensitivity: result.valorantSensitivity,
-        siteSensitivity: result.siteSensitivity,
-        totalScore: 0,
-        totalComposite: 0,
-        runs: 0,
-        rangeMin: result.valorantSensitivity,
-        rangeMax: result.valorantSensitivity,
-      };
-      entry.totalScore += result.score;
-      entry.totalComposite += result.compositeScore;
-      entry.runs += 1;
-      entry.rangeMin = Math.min(entry.rangeMin, result.valorantSensitivity);
-      entry.rangeMax = Math.max(entry.rangeMax, result.valorantSensitivity);
-      grouped.set(key, entry);
-    });
-
-    const ranked = [...grouped.values()]
-      .map((entry) => ({
-        ...entry,
-        averageScore: entry.totalScore / entry.runs,
-        averageComposite: entry.totalComposite / entry.runs,
-      }))
-      .sort((left, right) => right.averageComposite - left.averageComposite);
-
-    const bestComposite = ranked[0].averageComposite;
-    const contenders = ranked
-      .filter((entry) => entry.averageComposite >= bestComposite * 0.95)
-      .slice(0, 4);
-    const totalWeight =
-      contenders.reduce((sum, entry) => sum + entry.averageComposite ** 2, 0) || 1;
-
-    const recommendedValorantSensitivity = roundTo(
-      contenders.reduce(
-        (sum, entry) => sum + entry.valorantSensitivity * entry.averageComposite ** 2,
-        0,
-      ) / totalWeight,
-    );
-    const contenderRange = {
-      min: roundTo(Math.min(...contenders.map((entry) => entry.valorantSensitivity))),
-      max: roundTo(Math.max(...contenders.map((entry) => entry.valorantSensitivity))),
-    };
-    const secondComposite = ranked[1]?.averageComposite ?? bestComposite * 0.92;
-    const separation = bestComposite ? (bestComposite - secondComposite) / bestComposite : 0;
-    const spreadPenalty =
-      recommendedValorantSensitivity > 0
-        ? Math.abs(contenderRange.max - contenderRange.min) /
-          recommendedValorantSensitivity
-        : 0;
-    const confidence = clamp(
-      0.45 + separation * 1.7 + (1 - Math.min(spreadPenalty, 0.18) / 0.18) * 0.2,
-      0.35,
-      0.96,
-    );
     const focusLeaders = ['flick', 'precision', 'tracking', 'switch', 'mixed']
       .map((focus) => {
         const bestResult = results
@@ -916,23 +853,13 @@ export class GameEngine {
       .filter(Boolean);
 
     return {
-      recommendedValorantSensitivity,
-      recommendedSiteSensitivity: roundTo(
-        valorantSensitivityToSite(this.sensitivityFinder.dpi, recommendedValorantSensitivity),
-        2,
-      ),
-      rangeMin: contenderRange.min,
-      rangeMax: contenderRange.max,
-      confidence,
+      recommendedValorantSensitivity: rec.recommendedValorantSensitivity,
+      recommendedSiteSensitivity: rec.recommendedSiteSensitivity,
+      rangeMin: rec.rangeMin,
+      rangeMax: rec.rangeMax,
+      confidence: rec.confidence,
       focusLeaders,
-      notes: this.buildSensitivityNotes(
-        results,
-        this.sensitivityFinder.initialValorantSensitivity,
-        recommendedValorantSensitivity,
-        confidence,
-        contenderRange.min,
-        contenderRange.max,
-      ),
+      notes: [`Model confidence: ${(rec.confidence * 100).toFixed(1)}%`, `Stability Score: ${(rec.stabilityScore * 100).toFixed(1)}%`],
       topPhases: [...results]
         .sort((left, right) => right.score - left.score)
         .slice(0, 4),
@@ -1825,6 +1752,12 @@ export class GameEngine {
     this.lastShotAt = now;
     this.recoilKick = 1;
     this.stats.shots += 1;
+    
+    const recoilDelta = this.recoilSystem.fire(this.ads);
+    this.pointer.yaw += (recoilDelta.x * Math.PI) / 180;
+    this.pointer.pitch += (recoilDelta.y * Math.PI) / 180;
+    this.pointer.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pointer.pitch));
+
     const hits = this.getShotTargets();
 
     this.spawnTracer(hits.length ? hits[0].point : null);
@@ -2199,6 +2132,7 @@ export class GameEngine {
       Math.cos(swayTime * 1.4) * 0.012 * walkIntensity,
       0,
     );
+    this.recoilSystem.update(delta);
     this.recoilKick = Math.max(0, this.recoilKick - delta * 5);
     this.weapon.position.lerp(
       basePosition

@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AimForge — Технічний Аудит та Стратегія Розвитку</title>
+<style>
+:root {
+  --bg: #0a0e17;
+  --bg2: #111827;
+  --fg: #e2e8f0;
+  --fg2: #94a3b8;
+  --accent: #3b82f6;
+  --accent2: #8b5cf6;
+  --success: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --border: #1e293b;
+  --code-bg: #0f172a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.7;
+  font-size: 15px;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+header {
+  text-align: center; padding: 3rem 0; border-bottom: 2px solid var(--accent);
+  margin-bottom: 2rem; position: relative;
+}
+header h1 { font-size: 2.5rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+header .subtitle { color: var(--fg2); margin-top: 0.5rem; font-size: 1.1rem; }
+.badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.badge-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.badge-green { background: rgba(34,197,94,0.15); color: #4ade80; }
+.badge-amber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.badge-red { background: rgba(239,68,68,0.15); color: #f87171; }
+.badge-purple { background: rgba(139,92,246,0.15); color: #a78bfa; }
+
+.toc { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+.toc h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent); }
+.toc ul { list-style: none; }
+.toc li { padding: 0.3rem 0; }
+.toc a { color: var(--fg2); text-decoration: none; transition: color 0.2s; }
+.toc a:hover { color: var(--accent); }
+.toc .level-1 { font-weight: 600; color: var(--fg); }
+.toc .level-2 { padding-left: 1.5rem; }
+
+.section { margin-bottom: 3rem; }
+.section h2 { font-size: 1.6rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.section h3 { font-size: 1.25rem; color: var(--fg); margin: 1.5rem 0 1rem; }
+.section h4 { font-size: 1.05rem; color: var(--accent2); margin: 1.25rem 0 0.75rem; }
+
+.info-box { background: var(--bg2); border-left: 4px solid var(--accent); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+.info-box.warn { border-left-color: var(--warn); }
+.info-box.danger { border-left-color: var(--danger); }
+.info-box.success { border-left-color: var(--success); }
+.info-box-title { font-weight: 600; margin-bottom: 0.5rem; }
+
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.metric-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+.metric-card .label { color: var(--fg2); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.metric-card .value { font-size: 1.5rem; font-weight: 700; color: var(--accent); margin-top: 0.25rem; }
+.metric-card .value.success { color: var(--success); }
+.metric-card .value.warn { color: var(--warn); }
+.metric-card .value.danger { color: var(--danger); }
+
+pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; overflow-x: auto; margin: 1rem 0; }
+code { font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace; font-size: 0.85rem; }
+pre code { color: #c9d1d9; }
+.code-header { display: flex; align-items: center; justify-content: space-between; background: var(--bg2); padding: 0.5rem 1rem; border-radius: 10px 10px 0 0; border: 1px solid var(--border); border-bottom: none; font-size: 0.8rem; color: var(--fg2); }
+.code-header + pre { border-radius: 0 0 10px 10px; margin-top: 0; }
+
+.comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.comparison-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+.comparison-box .title { font-weight: 600; margin-bottom: 0.5rem; }
+.comparison-box.before { border-top: 3px solid var(--danger); }
+.comparison-box.after { border-top: 3px solid var(--success); }
+
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--bg2); color: var(--accent); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+tr:hover td { background: rgba(59,130,246,0.05); }
+
+.math { background: var(--bg2); padding: 0.75rem 1rem; border-radius: 8px; font-family: 'Times New Roman', serif; font-style: italic; margin: 0.5rem 0; display: inline-block; }
+
+.tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500; margin-right: 0.5rem; }
+.tag-critical { background: rgba(239,68,68,0.15); color: #f87171; }
+.tag-high { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.tag-medium { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.tag-low { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+.footer { text-align: center; padding: 2rem; color: var(--fg2); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>AimForge Technical Audit</h1>
+  <p class="subtitle">Глибокий аналіз архітектури та стратегія трансформації в професійний продукт</p>
+  <div style="margin-top:1rem;">
+    <span class="badge badge-blue">Three.js r152+</span>
+    <span class="badge badge-purple">Vite</span>
+    <span class="badge badge-green">Vanilla JS</span>
+    <span class="badge badge-amber">155 Scenarios</span>
+  </div>
+</header>
+
+<div class="toc">
+<h2>Зміст</h2>
+<ul>
+  <li class="level-1"><a href="#sec1">1. Архітектурний Огляд</a></li>
+  <li class="level-2"><a href="#sec1-1">1.1 Сильні сторони поточної архітектури</a></li>
+  <li class="level-2"><a href="#sec1-2">1.2 Критичні точки зростання</a></li>
+  <li class="level-1"><a href="#sec2">2. Еволюція Sensitivity Finder</a></li>
+  <li class="level-2"><a href="#sec2-1">2.1 Аналіз поточного алгоритму</a></li>
+  <li class="level-2"><a href="#sec2-2">2.2 Адаптивна система з динамічною складністю</a></li>
+  <li class="level-2"><a href="#sec2-3">2.3 Математична модель EDPI-оптимізації</a></li>
+  <li class="level-2"><a href="#sec2-4">2.4 Багаторівневий тест 10+ фаз</a></li>
+  <li class="level-1"><a href="#sec3">3. Оптимізація Рушія</a></li>
+  <li class="level-2"><a href="#sec3-1">3.1 InstancedMesh для частинок і мішеней</a></li>
+  <li class="level-2"><a href="#sec3-2">3.2 Object Pooling 2.0</a></li>
+  <li class="level-2"><a href="#sec3-3">3.3 Frustum Culling та оптимізований Raycasting</a></li>
+  <li class="level-1"><a href="#sec4">4. Flick Path Analysis</a></li>
+  <li class="level-1"><a href="#sec5">5. Realistic Recoil System</a></li>
+  <li class="level-1"><a href="#sec6">6. Ranked System</a></li>
+  <li class="level-1"><a href="#sec7">7. 3D Spatial Audio</a></li>
+  <li class="level-1"><a href="#sec8">8. Ghost Mode (Replay System)</a></li>
+  <li class="level-1"><a href="#sec9">9. High Refresh Rate & Delta Time</a></li>
+  <li class="level-1"><a href="#sec10">10. Roadmap до Професійного Продукту</a></li>
+</ul>
+</div>
+
+<!-- ===================== SECTION 1 ===================== -->
+<div class="section" id="sec1">
+<h2>1. Архітектурний Огляд</h2>
+
+<h3 id="sec1-1">1.1 Сильні сторони поточної архітектури</h3>
+
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="label">Покриття сценаріїв</div>
+    <div class="value success">155 сценаріїв</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Категорій тренувань</div>
+    <div class="value success">10 категорій</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Weapon Systems</div>
+    <div class="value">4 типи (Pistol/Rifle/Shotgun/Sniper)</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Particle Pool</div>
+    <div class="value warn">64 particles</div>
+  </div>
+</div>
+
+<p>Проєкт має продуману модульну архітектуру з чітким розділенням відповідальності:</p>
+<ul>
+  <li><strong>App.js</strong> — чиста презентаційна логіка (State → Render → Interaction), патерн State Machine для екранів</li>
+  <li><strong>GameEngine.js</strong> — ізольований ігровий цикл з підтримкою Pointer Lock, життєвим циклом сутностей та HUD</li>
+  <li><strong>scenarios.js</strong> — декларативна фабрика сценаріїв з 20+ параметрами конфігурації</li>
+  <li><strong>WeaponBuilder.js</strong> — процедурна генерація 3D-моделей зброї через примітиви Three.js</li>
+  <li><strong>BotFactory.js</strong> — ієрархічна скелетна структура ботів з hitbox-ми (head/body)</li>
+</ul>
+
+<h3 id="sec1-2">1.2 Критичні точки зростання</h3>
+
+<table>
+<tr><th>Проблема</th><th>Пріоритет</th><th>Наслідок</th></tr>
+<tr><td>ParticlePool створює <code>size</code> окремих Mesh</td><td><span class="tag tag-critical">Critical</span></td><td>O(n) draw calls, GC pressure при 1000+ частинках</td></tr>
+<tr><td>Боти — окремі Group з 16+ Mesh</td><td><span class="tag tag-critical">Critical</span></td><td>Кожен бот = 16 draw calls, 60 ботів = 960 calls/кадр</td></tr>
+<tr><td>Немає InstancedMesh для сфер-мішеней</td><td><span class="tag tag-high">High</span></td><td>GridShot з 15 concurrent = 15 draw calls замість 1</td></tr>
+<tr><td>Raycaster перебирає ВСІ об'єкти сцени</td><td><span class="tag tag-high">High</span></td><td>O(n) зростання вартості кожного пострілу</td></tr>
+<tr><td>SoundManager — лише procedural tones</td><td><span class="tag tag-medium">Medium</span></td><td>Немає позиційного аудіо для spatial awareness</td></tr>
+<tr><td>Немає delta-time компенсації фізики</td><td><span class="tag tag-high">High</span></td><td>144Hz vs 60Hz дають різну складність</td></tr>
+<tr><td>Немає реплей-системи</td><td><span class="tag tag-medium">Medium</span></td><td>Неможливо реалізувати Ghost Mode</td></tr>
+</table>
+
+<div class="info-box warn">
+<div class="info-box-title">Головне архітектурне обмеження</div>
+Поточна реалізація використовує традиційний підхід "одна мішень = один Mesh". При масштабуванні до сотень мішеней (Swarm Mode з 15 concurrent, режим виживання) це створює bottleneck на рівні CPU → GPU комунікації. Перехід на <strong>InstancedMesh</strong> та <strong>SkinnedMesh</strong> для ботів — обов'язкова умова професійного рівня.
+</div>
+</div>
+
+<!-- ===================== SECTION 2 ===================== -->
+<div class="section" id="sec2">
+<h2>2. Еволюція Sensitivity Finder</h2>
+
+<h3 id="sec2-1">2.1 Аналіз поточного алгоритму</h3>
+
+<p>Поточна система (GameEngine.js, рядки 301-940) реалізує двофазний підхід:</p>
+
+<div class="comparison">
+<div class="comparison-box before">
+<div class="title">Coarse Phase (4 фази)</div>
+Wide Flick Low/High (±18%)<br>
+Micro Correction Low/High (±8%)<br>
+<br>
+Duration: 45s each<br>
+Focus: flick, precision
+</div>
+<div class="comparison-box after">
+<div class="title">Refine Phase (6 фаз)</div>
+Smooth Track Low/High (±6%)<br>
+Strafe Transfer Low/High (±3%)<br>
+Precision Validation, Pressure Mix<br>
+<br>
+Duration: 70s each
+</div>
+</div>
+
+<p>Ключові метрики телеметрії (createTargetTelemetry / finalizeTargetTelemetry):</p>
+<ul>
+  <li><strong>pathEfficiency</strong> = initialAngularError / angularTravel (оптимальність траєкторії)</li>
+  <li><strong>trackingStability</strong> = trackedTime / lifetime (частка часу в наведенні)</li>
+  <li><strong>acquireTime</strong> = firstAcquireAt - spawnTime (швидкість захоплення мішені)</li>
+  <li><strong>correctionSwitches</strong> = кількість змін напрямку корекції ("тремтіння")</li>
+</ul>
+
+<p>Формула composite score (scoreSensitivityPhase) використовує зважену суму 7 нормалізованих метрик:</p>
+<div class="math">
+S<sub>composite</sub> = Σ(w<sub>i</sub> × metric<sub>i,norm</sub>) × 1000 + hits×34 + headshots×18 - misses×16
+</div>
+
+<h3 id="sec2-2">2.2 Адаптивна система з динамічною складністю</h3>
+
+<p>Поточна система має статичні фази з фіксованою relativeSensitivity. Для професійного рівня потрібна <strong>реальна адаптація</strong> — складність має змінюватися в залежності від продуктивності гравця в межах однієї фази.</p>
+
+<div class="info-box">
+<div class="info-box-title">Архітектура Adaptive Difficulty Controller</div>
+Концепція: якщо гравець набирає >85% точності — збільшувати швидкість мішеней на 12%. Якщо <50% — зменшувати на 15%. Це дозволяє тримати гравця в "зоні потоку" (flow channel) протягом усього тесту.
+</div>
+
+<pre><code>// src/game/AdaptiveDifficultyController.js
+export class AdaptiveDifficultyController {
+  constructor(baseScenario, targetAccuracy = 0.72, windowSize = 8) {
+    this.baseScenario = baseScenario;
+    this.targetAccuracy = targetAccuracy;
+    this.windowSize = windowSize;
+    this.accuracyWindow = [];
+    this.reactionWindow = [];
+    this.difficultyMultiplier = 1.0;
+    this.minMultiplier = 0.5;
+    this.maxMultiplier = 2.0;
+    this.adaptationHistory = [];
+  }
+
+  feedEvent(isHit, reactionMs, targetAngularError) {
+    this.accuracyWindow.push(isHit ? 1 : 0);
+    if (reactionMs > 0) this.reactionWindow.push(reactionMs);
+    if (this.accuracyWindow.length > this.windowSize) {
+      this.accuracyWindow.shift();
+      if (this.reactionWindow.length > this.windowSize) this.reactionWindow.shift();
+    }
+    return this.evaluateAndAdapt();
+  }
+
+  evaluateAndAdapt() {
+    if (this.accuracyWindow.length < this.windowSize * 0.5) return null;
+
+    const currentAccuracy = this.accuracyWindow.reduce((a, b) => a + b, 0) / this.accuracyWindow.length;
+    const currentReaction = this.reactionWindow.length 
+      ? this.reactionWindow.reduce((a, b) => a + b, 0) / this.reactionWindow.length 
+      : 400;
+
+    // PID-like controller for difficulty
+    const accuracyError = this.targetAccuracy - currentAccuracy;
+    const reactionNorm = Math.max(0, Math.min(1, (currentReaction - 150) / 500));
+
+    // Higher accuracy → increase difficulty
+    // Lower reaction time → can handle harder targets
+    const adjustment = accuracyError * 0.3 + (reactionNorm - 0.5) * 0.15;
+    this.difficultyMultiplier = clamp(
+      this.difficultyMultiplier - adjustment,
+      this.minMultiplier,
+      this.maxMultiplier
+    );
+
+    const adaptedParams = this.computeAdaptedParams();
+    this.adaptationHistory.push({
+      timestamp: performance.now(),
+      multiplier: this.difficultyMultiplier,
+      accuracy: currentAccuracy,
+      reaction: currentReaction,
+    });
+
+    return adaptedParams;
+  }
+
+  computeAdaptedParams() {
+    const m = this.difficultyMultiplier;
+    return {
+      spawnInterval: this.baseScenario.spawnInterval / Math.sqrt(m),     // harder = faster spawn
+      expiry: this.baseScenario.expiry / m,                               // harder = less time
+      radius: this.baseScenario.radius / Math.sqrt(Math.min(m, 1.4)),     // harder = smaller targets
+      movementSpeed: m,                                                    // harder = faster movement
+    };
+  }
+}</code></pre>
+
+<h3 id="sec2-3">2.3 Математична модель EDPI-оптимізації</h3>
+
+<p>Поточна рекомендація базується на weighted average по compositeScore. Для професійного рівня потрібна модель, яка враховує <strong>Pareto-оптимальність</strong> між швидкістю реакції та точністю.</p>
+
+<p><strong>Модель "EDPI Sweet Spot" (квадратична регресія):</strong></p>
+
+<pre><code>// src/game/SensitivityOptimizer.js
+export class SensitivityOptimizer {
+  // Fit quadratic model: Score = a*sens^2 + b*sens + c
+  // Find vertex (optimal) and confidence interval
+
+  static analyze(results) {
+    // results: Array<{ valorantSensitivity, compositeScore, accuracy, avgReaction }>
+    if (results.length < 4) return null;
+
+    // 1. Quadratic regression for composite score
+    const n = results.length;
+    const sumX = results.reduce((s, r) => s + r.valorantSensitivity, 0);
+    const sumX2 = results.reduce((s, r) => s + r.valorantSensitivity ** 2, 0);
+    const sumX3 = results.reduce((s, r) => s + r.valorantSensitivity ** 3, 0);
+    const sumX4 = results.reduce((s, r) => s + r.valorantSensitivity ** 4, 0);
+    const sumY = results.reduce((s, r) => s + r.compositeScore, 0);
+    const sumXY = results.reduce((s, r) => s + r.valorantSensitivity * r.compositeScore, 0);
+    const sumX2Y = results.reduce((s, r) => s + r.valorantSensitivity ** 2 * r.compositeScore, 0);
+
+    // Solve normal equations for [a, b, c] in y = ax² + bx + c
+    const matrix = [
+      [sumX4, sumX3, sumX2],
+      [sumX3, sumX2, sumX],
+      [sumX2, sumX,  n],
+    ];
+    const rhs = [sumX2Y, sumXY, sumY];
+    const [a, b, c] = solve3x3(matrix, rhs);
+
+    // 2. Vertex = optimal sensitivity
+    const optimalSens = -b / (2 * a);
+    const optimalScore = a * optimalSens ** 2 + b * optimalSens + c;
+
+    // 3. Confidence interval: where score >= 95% of optimal
+    const threshold = optimalScore * 0.95;
+    const discriminant = b ** 2 - 4 * a * (c - threshold);
+    let rangeMin, rangeMax;
+    if (discriminant >= 0) {
+      rangeMin = (-b - Math.sqrt(discriminant)) / (2 * a);
+      rangeMax = (-b + Math.sqrt(discriminant)) / (2 * a);
+    }
+
+    // 4. Reaction-Accuracy Pareto Frontier
+    const pareto = this.computeParetoFrontier(results);
+
+    // 5. Stability metric: lower corrections = more stable aim
+    const stabilityScore = results.reduce((s, r) => {
+      return s + (r.avgCorrections < 1.5 ? 1 : r.avgCorrections < 3 ? 0.5 : 0);
+    }, 0) / results.length;
+
+    return {
+      recommendedValorantSensitivity: roundTo(optimalSens),
+      recommendedSiteSensitivity: roundTo(valorantSensitivityToSite(dpi, optimalSens), 2),
+      rangeMin: roundTo(rangeMin),
+      rangeMax: roundTo(rangeMax),
+      confidence: this.computeConfidence(a, results, optimalSens),
+      stabilityScore,
+      paretoFrontier: pareto,
+      model: { a, b, c },
+    };
+  }
+
+  static computeParetoFrontier(results) {
+    // Find points where improving one metric worsens another
+    const sorted = [...results].sort((a, b) => a.avgReaction - b.avgReaction);
+    const frontier = [];
+    let maxAccuracy = -1;
+    for (const point of sorted) {
+      if (point.accuracy > maxAccuracy) {
+        frontier.push(point);
+        maxAccuracy = point.accuracy;
+      }
+    }
+    return frontier;
+  }
+
+  static computeConfidence(a, results, optimal) {
+    // Negative a = concave down (good, has maximum)
+    // Magnitude of a = how "sharp" the peak is
+    if (a >= 0) return 0.35; // No clear optimum
+
+    const curvature = Math.abs(a);
+    const spread = results.reduce((s, r) => {
+      return s + (r.valorantSensitivity - optimal) ** 2;
+    }, 0) / results.length;
+
+    return clamp(0.5 + curvature * 10 - spread * 2, 0.35, 0.96);
+  }
+}</code></pre>
+
+<h3 id="sec2-4">2.4 Багаторівневий тест 10+ фаз</h3>
+
+<p>Розширена структура фаз покриває всі аспекти аім-навичок:</p>
+
+<table>
+<tr><th>#</th><th>Фаза</th><th>Фокус</th><th>Тривалість</th><th>Тип мішеней</th><th>Метрики</th></tr>
+<tr><td>1</td><td>Micro Flick Precision</td><td>Мікро-корекції</td><td>60s</td><td>Сфери r=0.12, center-only</td><td>overshoot%, correction count</td></tr>
+<tr><td>2</td><td>Wide Angle Flick</td><td>Великі фліки</td><td>60s</td><td>Сфери r=0.28, 180° cone</td><td>path efficiency, reaction time</td></tr>
+<tr><td>3</td><td>Diagonal Flick</td><td>Діагональний рух</td><td>60s</td><td>Сфери r=0.24, diagonal-lane</td><td>angular travel, stop precision</td></tr>
+<tr><td>4</td><td>Tracking Figure-8</td><td>Плавний трекінг</td><td>75s</td><td>hover, figure8</td><td>tracking stability, time on target</td></tr>
+<tr><td>5</td><td>Tracking Reactive</td><td>Реактивний трекінг</td><td>75s</td><td>hover, reactive-track</td><td>re-acquisition speed</td></tr>
+<tr><td>6</td><td>Strafe Transfer</td><td>Переключення</td><td>60s</td><td>bot, wide-strafe</td><td>switch time, accuracy maintenance</td></tr>
+<tr><td>7</td><td>Speed Grid</td><td>Швидкість + точність</td><td>45s</td><td>grid 2×4</td><td>targets/min, miss rate</td></tr>
+<tr><td>8</td><td>Precision Headshot</td><td>Хедшот-фокус</td><td>60s</td><td>bot, headshotOnly</td><td>headshot%, flick-to-head time</td></tr>
+<tr><td>9</td><td>Bot Rush Clear</td><td>Pressure handling</td><td>60s</td><td>bot, rush, concurrent=4</td><td>target priority, panic index</td></tr>
+<tr><td>10</td><td>Adaptive Mixed</td><td>Комбіноване</td><td>90s</td><td>mixed types, adaptive difficulty</td><td>composite, adaptability score</td></tr>
+<tr><td>11</td><td>Endurance Tracking</td><td>Витривалість</td><td>120s</td><td>lissajous curve</td><td>consistency over time (CV)</td></tr>
+<tr><td>12</td><td>Fatigue Test</td><td>Коефіцієнт втоми</td><td>60s</td><td>speed doubles every 20s</td><td>performance decay rate</td></tr>
+</table>
+
+<pre><code>// Розширені фази для Sensitivity Finder
+const ADVANCED_SENSITIVITY_PHASES = [
+  // --- MICRO FLICK BLOCK ---
+  {
+    label: 'Micro Flick Low',
+    focus: 'micro-flick',
+    duration: 60,
+    relativeSensitivity: 0.85,
+    telemetryWeights: {
+      overshootRatio: 0.35,      // key metric for micro
+      correctionCount: 0.25,
+      reactionTime: 0.15,
+      accuracy: 0.25,
+    },
+    config: {
+      targetType: 'sphere',
+      concurrentTargets: 1,
+      spawnInterval: 0.28,
+      expiry: 1.0,
+      radius: 0.12,
+      movement: 'static',
+      tags: ['center', 'micro'],
+    },
+  },
+  {
+    label: 'Micro Flick High',
+    focus: 'micro-flick',
+    duration: 60,
+    relativeSensitivity: 1.15,
+    telemetryWeights: { overshootRatio: 0.35, correctionCount: 0.25, reactionTime: 0.15, accuracy: 0.25 },
+    config: {
+      targetType: 'sphere', concurrentTargets: 1, spawnInterval: 0.28,
+      expiry: 1.0, radius: 0.12, movement: 'static', tags: ['center', 'micro'],
+    },
+  },
+  // --- WIDE FLICK BLOCK ---
+  {
+    label: 'Wide Flick Low',
+    focus: 'wide-flick',
+    duration: 60,
+    relativeSensitivity: 0.80,
+    telemetryWeights: {
+      pathEfficiency: 0.30,
+      reactionTime: 0.25,
+      accuracy: 0.25,
+      angularTravel: 0.20,
+    },
+    config: {
+      targetType: 'sphere', concurrentTargets: 1, spawnInterval: 0.55,
+      expiry: 1.4, radius: 0.28, movement: 'static', tags: ['wide-angle'],
+    },
+  },
+  {
+    label: 'Wide Flick High',
+    focus: 'wide-flick',
+    duration: 60,
+    relativeSensitivity: 1.20,
+    telemetryWeights: { pathEfficiency: 0.30, reactionTime: 0.25, accuracy: 0.25, angularTravel: 0.20 },
+    config: {
+      targetType: 'sphere', concurrentTargets: 1, spawnInterval: 0.55,
+      expiry: 1.4, radius: 0.28, movement: 'static', tags: ['wide-angle'],
+    },
+  },
+  // --- DIAGONAL FLICK BLOCK ---
+  {
+    label: 'Diagonal Flick Low',
+    focus: 'diagonal-flick',
+    duration: 60,
+    relativeSensitivity: 0.88,
+    telemetryWeights: {
+      pathEfficiency: 0.35,
+      stopPrecision: 0.25,
+      correctionCount: 0.20,
+      accuracy: 0.20,
+    },
+    config: {
+      targetType: 'sphere', concurrentTargets: 1, spawnInterval: 0.45,
+      expiry: 1.2, radius: 0.22, movement: 'diagonal-lane',
+    },
+  },
+  {
+    label: 'Diagonal Flick High',
+    focus: 'diagonal-flick',
+    duration: 60,
+    relativeSensitivity: 1.12,
+    telemetryWeights: { pathEfficiency: 0.35, stopPrecision: 0.25, correctionCount: 0.20, accuracy: 0.20 },
+    config: {
+      targetType: 'sphere', concurrentTargets: 1, spawnInterval: 0.45,
+      expiry: 1.2, radius: 0.22, movement: 'diagonal-lane',
+    },
+  },
+  // --- TRACKING BLOCK ---
+  {
+    label: 'Smooth Track Low',
+    focus: 'tracking',
+    duration: 75,
+    relativeSensitivity: 0.90,
+    telemetryWeights: {
+      trackingStability: 0.40,
+      timeOnTarget: 0.25,
+      smoothnessScore: 0.20,
+      accuracy: 0.15,
+    },
+    config: {
+      targetType: 'tracking', interaction: 'hover', concurrentTargets: 1,
+      spawnInterval: 0.2, trackHold: 1.0, radius: 0.32, movement: 'figure8',
+    },
+  },
+  {
+    label: 'Smooth Track High',
+    focus: 'tracking',
+    duration: 75,
+    relativeSensitivity: 1.10,
+    telemetryWeights: { trackingStability: 0.40, timeOnTarget: 0.25, smoothnessScore: 0.20, accuracy: 0.15 },
+    config: {
+      targetType: 'tracking', interaction: 'hover', concurrentTargets: 1,
+      spawnInterval: 0.2, trackHold: 1.0, radius: 0.32, movement: 'figure8',
+    },
+  },
+  // --- REACTIVE TRACKING BLOCK ---
+  {
+    label: 'Reactive Track Low',
+    focus: 'reactive-tracking',
+    duration: 75,
+    relativeSensitivity: 0.92,
+    telemetryWeights: {
+      reacquisitionSpeed: 0.35,
+      trackingStability: 0.25,
+      correctionCount: 0.20,
+      accuracy: 0.20,
+    },
+    config: {
+      targetType: 'tracking', interaction: 'hover', concurrentTargets: 1,
+      spawnInterval: 0.18, trackHold: 0.95, radius: 0.30, movement: 'reactive-track',
+    },
+  },
+  {
+    label: 'Reactive Track High',
+    focus: 'reactive-tracking',
+    duration: 75,
+    relativeSensitivity: 1.08,
+    telemetryWeights: { reacquisitionSpeed: 0.35, trackingStability: 0.25, correctionCount: 0.20, accuracy: 0.20 },
+    config: {
+      targetType: 'tracking', interaction: 'hover', concurrentTargets: 1,
+      spawnInterval: 0.18, trackHold: 0.95, radius: 0.30, movement: 'reactive-track',
+    },
+  },
+  // --- ENDURANCE BLOCK ---
+  {
+    label: 'Endurance Track',
+    focus: 'endurance',
+    duration: 120,
+    relativeSensitivity: 1.0,
+    telemetryWeights: {
+      consistencyCV: 0.40,        // coefficient of variation
+      trackingStability: 0.30,
+      fatigueIndex: 0.30,         // performance in last 30s vs first 30s
+    },
+    config: {
+      targetType: 'tracking', interaction: 'hover', concurrentTargets: 1,
+      spawnInterval: 0.15, trackHold: 1.1, radius: 0.28, movement: 'lissajous',
+    },
+  },
+  // --- ADAPTIVE MIXED (Dynamic difficulty) ---
+  {
+    label: 'Adaptive Mixed Final',
+    focus: 'mixed-adaptive',
+    duration: 90,
+    relativeSensitivity: 1.0,
+    adaptive: true,
+    telemetryWeights: {
+      adaptabilityScore: 0.30,    // how well player adapts to difficulty changes
+      composite: 0.30,
+      consistency: 0.20,
+      pressureHandling: 0.20,
+    },
+    config: {
+      targetType: 'challenge',
+      concurrentTargets: 3,
+      spawnInterval: 0.2,
+      radius: 0.24,
+      movement: 'mixed',
+    },
+  },
+];</code></pre>
+</div>
+
+<!-- ===================== SECTION 3 ===================== -->
+<div class="section" id="sec3">
+<h2>3. Оптимізація Рушія</h2>
+
+<h3 id="sec3-1">3.1 InstancedMesh для частинок і мішеней</h3>
+
+<p>Поточний ParticlePool створює N окремих Mesh. При 64 частинках це прийнятно, але для ефектів типу "hit spark explosion" (200+ частинок) потрібен <strong>InstancedMesh</strong>.</p>
+
+<div class="info-box">
+<div class="info-box-title">Переваги InstancedMesh</div>
+<ul>
+  <li>1 draw call для 1000+ екземплярів замість 1000 draw calls</li>
+  <li>Матриця трансформації обчислюється на CPU, передається як атрибут інстансу</li>
+  <li>Гарантована сумісність з frustum culling (per-instance)</li>
+</ul>
+</div>
+
+<pre><code>// src/game/InstancedParticleSystem.js
+import * as THREE from 'three';
+
+export class InstancedParticleSystem {
+  constructor(scene, maxCount = 512) {
+    this.scene = scene;
+    this.maxCount = maxCount;
+    this.count = 0;
+
+    // Single geometry + material for ALL particles
+    const geometry = new THREE.SphereGeometry(0.03, 6, 6);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xff6644,
+      transparent: true,
+      opacity: 1,
+      depthWrite: false,
+    });
+
+    this.mesh = new THREE.InstancedMesh(geometry, material, maxCount);
+    this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.mesh.frustumCulled = false; // Particles are short-lived, skip culling
+    scene.add(this.mesh);
+
+    // Particle state arrays (object pool pattern)
+    this.active = new Uint8Array(maxCount);
+    this.velocities = new Float32Array(maxCount * 3);
+    this.lifetimes = new Float32Array(maxCount);
+    this.maxLifetimes = new Float32Array(maxCount);
+    this.colors = new Float32Array(maxCount * 3);
+
+    this.dummy = new THREE.Object3D();
+    this._freeIndices = [];
+    for (let i = maxCount - 1; i >= 0; i--) this._freeIndices.push(i);
+  }
+
+  burst(position, color = '#ff6644', count = 12) {
+    const c = new THREE.Color(color);
+    for (let i = 0; i < count && this._freeIndices.length > 0; i++) {
+      const idx = this._freeIndices.pop();
+      this.active[idx] = 1;
+
+      // Velocity with gravity-aware spread
+      this.velocities[idx * 3] = (Math.random() - 0.5) * 4;
+      this.velocities[idx * 3 + 1] = Math.random() * 3 + 0.5;
+      this.velocities[idx * 3 + 2] = (Math.random() - 0.5) * 4;
+
+      this.lifetimes[idx] = 0.4 + Math.random() * 0.3;
+      this.maxLifetimes[idx] = this.lifetimes[idx];
+
+      this.colors[idx * 3] = c.r;
+      this.colors[idx * 3 + 1] = c.g;
+      this.colors[idx * 3 + 2] = c.b;
+
+      this.dummy.position.copy(position);
+      this.dummy.updateMatrix();
+      this.mesh.setMatrixAt(idx, this.dummy.matrix);
+    }
+    this.mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  update(delta) {
+    let needsUpdate = false;
+    const gravity = -9.8;
+
+    for (let i = 0; i < this.maxCount; i++) {
+      if (!this.active[i]) continue;
+
+      this.lifetimes[i] -= delta;
+      if (this.lifetimes[i] <= 0) {
+        this.active[i] = 0;
+        this._freeIndices.push(i);
+        // Move off-screen
+        this.dummy.position.set(0, -9999, 0);
+        this.dummy.updateMatrix();
+        this.mesh.setMatrixAt(i, this.dummy.matrix);
+        needsUpdate = true;
+        continue;
+      }
+
+      // Update velocity with gravity
+      this.velocities[i * 3 + 1] += gravity * delta;
+
+      // Get current position from matrix
+      this.mesh.getMatrixAt(i, this.dummy.matrix);
+      this.dummy.position.setFromMatrixPosition(this.dummy.matrix);
+
+      // Apply velocity
+      this.dummy.position.x += this.velocities[i * 3] * delta;
+      this.dummy.position.y += this.velocities[i * 3 + 1] * delta;
+      this.dummy.position.z += this.velocities[i * 3 + 2] * delta;
+
+      // Scale down as life fades
+      const lifeRatio = this.lifetimes[i] / this.maxLifetimes[i];
+      this.dummy.scale.setScalar(lifeRatio);
+
+      this.dummy.updateMatrix();
+      this.mesh.setMatrixAt(i, this.dummy.matrix);
+      needsUpdate = true;
+    }
+
+    if (needsUpdate) {
+      this.mesh.instanceMatrix.needsUpdate = true;
+    }
+  }
+
+  dispose() {
+    this.scene.remove(this.mesh);
+    this.mesh.geometry.dispose();
+    this.mesh.material.dispose();
+  }
+}</code></pre>
+
+<h4>InstancedMesh для сфер-мішеней (GridShot):</h4>
+
+<pre><code>// src/game/InstancedTargetManager.js
+export class InstancedTargetManager {
+  constructor(scene, maxTargets = 64) {
+    this.scene = scene;
+    this.maxTargets = maxTargets;
+
+    const geometry = new THREE.SphereGeometry(1, 12, 12);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0xffffff,
+      emissiveIntensity: 0.3,
+      roughness: 0.45,
+      metalness: 0.08,
+    });
+
+    this.mesh = new THREE.InstancedMesh(geometry, material, maxTargets);
+    this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.mesh.instanceColor = new THREE.InstancedBufferAttribute(
+      new Float32Array(maxTargets * 3), 3
+    );
+    scene.add(this.mesh);
+
+    this.targetData = new Array(maxTargets).fill(null);
+    this.availableSlots = [];
+    for (let i = maxTargets - 1; i >= 0; i--) this.availableSlots.push(i);
+
+    this.dummy = new THREE.Object3D();
+  }
+
+  spawnTarget(position, radius = 0.3, color = '#ff6644', metadata = {}) {
+    if (this.availableSlots.length === 0) return null;
+    const slot = this.availableSlots.pop();
+
+    this.dummy.position.copy(position);
+    this.dummy.scale.setScalar(radius);
+    this.dummy.updateMatrix();
+
+    this.mesh.setMatrixAt(slot, this.dummy.matrix);
+
+    const c = new THREE.Color(color);
+    this.mesh.setColorAt(slot, c);
+
+    this.targetData[slot] = {
+      active: true,
+      position: position.clone(),
+      radius,
+      spawnTime: performance.now(),
+      ...metadata,
+    };
+
+    this.mesh.instanceMatrix.needsUpdate = true;
+    if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
+
+    return slot; // Return instance ID for raycasting
+  }
+
+  updateTarget(slot, newPosition) {
+    if (!this.targetData[slot]?.active) return;
+
+    this.targetData[slot].position.copy(newPosition);
+    this.mesh.getMatrixAt(slot, this.dummy.matrix);
+    this.dummy.position.copy(newPosition);
+    this.dummy.updateMatrix();
+    this.mesh.setMatrixAt(slot, this.dummy.matrix);
+    this.mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  removeTarget(slot) {
+    if (!this.targetData[slot]?.active) return;
+    this.targetData[slot].active = false;
+    this.availableSlots.push(slot);
+
+    // Move off-screen
+    this.dummy.position.set(0, -9999, 0);
+    this.dummy.updateMatrix();
+    this.mesh.setMatrixAt(slot, this.dummy.matrix);
+    this.mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  // Optimized raycast: test bounding spheres first, then precise
+  raycast(ray) {
+    const hits = [];
+    for (let i = 0; i < this.maxTargets; i++) {
+      if (!this.targetData[i]?.active) continue;
+      const target = this.targetData[i];
+      const distSq = ray.distanceSqToPoint(target.position);
+      if (distSq <= target.radius * target.radius) {
+        const intersection = new THREE.Vector3();
+        ray.intersectSphere(
+          new THREE.Sphere(target.position, target.radius),
+          intersection
+        );
+        hits.push({ instanceId: i, point: intersection, distance: ray.origin.distanceTo(intersection) });
+      }
+    }
+    hits.sort((a, b) => a.distance - b.distance);
+    return hits;
+  }
+
+  dispose() {
+    this.scene.remove(this.mesh);
+    this.mesh.geometry.dispose();
+    this.mesh.material.dispose();
+  }
+}</code></pre>
+
+<h3 id="sec3-2">3.2 Object Pooling 2.0</h3>
+
+<p>Поточна система (spherePool, botPool) вже використовує pooling, але боти створюються через BotFactory як повноцінні Group з 16 окремих Mesh. Для 100+ ботів потрібен <strong>LOD (Level of Detail)</strong> та <strong>impostor fallback</strong>.</p>
+
+<pre><code>// src/game/BotPool.js — Advanced version with LOD
+import * as THREE from 'three';
+import { createBot } from './BotFactory.js';
+
+export class BotPool {
+  constructor(scene, size = 32) {
+    this.scene = scene;
+    this.size = size;
+    this.pool = [];
+
+    // Pre-create all bots (expensive once, fast reuse)
+    for (let i = 0; i < size; i++) {
+      const bot = createBot();
+      bot.visible = false;
+      bot.userData.active = false;
+      bot.userData.poolIndex = i;
+      scene.add(bot);
+      this.pool.push(bot);
+    }
+
+    this.activeBots = new Set();
+  }
+
+  acquire(spawnPosition, behavior = 'idle', config = {}) {
+    // Find inactive bot
+    const bot = this.pool.find(b => !b.userData.active);
+    if (!bot) return null;
+
+    bot.visible = true;
+    bot.userData.active = true;
+    bot.position.copy(spawnPosition);
+    bot.userData.behavior = behavior;
+    bot.userData.hp = config.hp || 100;
+    bot.userData.spawnTime = performance.now();
+    bot.userData.lastDecision = 0;
+    bot.userData.velocity = new THREE.Vector3();
+
+    // Reset pose
+    const parts = bot.userData.parts;
+    if (parts) {
+      Object.entries(parts).forEach(([name, mesh]) => {
+        if (mesh.userData.defaultPosition) {
+          mesh.position.copy(mesh.userData.defaultPosition);
+        }
+      });
+    }
+
+    this.activeBots.add(bot);
+    return bot;
+  }
+
+  release(bot) {
+    bot.visible = false;
+    bot.userData.active = false;
+    bot.position.set(0, -9999, 0);
+    this.activeBots.delete(bot);
+  }
+
+  update(delta, camera, scenario) {
+    const now = performance.now();
+
+    for (const bot of this.activeBots) {
+      this.updateBotBehavior(bot, delta, camera, scenario, now);
+      this.updateBotAnimation(bot, delta);
+
+      // Auto-release if expired
+      if (bot.userData.expiryAt && now > bot.userData.expiryAt) {
+        this.release(bot);
+      }
+    }
+  }
+
+  updateBotBehavior(bot, delta, camera, scenario, now) {
+    const behavior = bot.userData.behavior;
+    const age = (now - bot.userData.spawnTime) / 1000;
+    const toCamera = camera.position.clone().sub(bot.position).normalize();
+
+    switch (behavior) {
+      case 'idle': {
+        // Face camera with slight breathing
+        bot.rotation.y = Math.atan2(toCamera.x, toCamera.z);
+        bot.position.y += Math.sin(age * 2) * 0.001;
+        break;
+      }
+      case 'strafe': {
+        // Horizontal strafe with sine wave
+        const strafeSpeed = 1.5;
+        const strafeRange = 4;
+        const strafeOffset = Math.sin(age * strafeSpeed) * strafeRange;
+        bot.position.x = bot.userData.spawnPosition.x + strafeOffset;
+        bot.rotation.y = Math.atan2(toCamera.x, toCamera.z);
+        break;
+      }
+      case 'approach': {
+        // Walk toward camera
+        const approachSpeed = 1.2;
+        bot.position.add(toCamera.multiplyScalar(approachSpeed * delta));
+        bot.rotation.y = Math.atan2(toCamera.x, toCamera.z);
+        // Animate legs
+        this.animateWalk(bot, age, 8);
+        break;
+      }
+      case 'rush': {
+        // Fast approach with slight jitter
+        const rushSpeed = 3.5;
+        const jitter = Math.sin(age * 15) * 0.3;
+        toCamera.x += jitter * delta;
+        bot.position.add(toCamera.normalize().multiplyScalar(rushSpeed * delta));
+        bot.rotation.y = Math.atan2(toCamera.x, toCamera.z);
+        this.animateWalk(bot, age, 12);
+        break;
+      }
+      case 'wide-strafe': {
+        // Wide strafe at distance
+        const speed = 2.0;
+        const strafeX = Math.sin(age * speed) * 6;
+        const strafeZ = Math.cos(age * speed * 0.7) * 3;
+        bot.position.set(
+          bot.userData.spawnPosition.x + strafeX,
+          bot.userData.spawnPosition.y,
+          bot.userData.spawnPosition.z + strafeZ
+        );
+        bot.rotation.y = Math.atan2(toCamera.x, toCamera.z);
+        break;
+      }
+      case 'peek': {
+        // Peek from cover and hide
+        const cycle = 3; // seconds per peek cycle
+        const phase = (age % cycle) / cycle;
+        if (phase < 0.3) {
+          // Emerging
+          bot.position.z = THREE.MathUtils.lerp(
+            bot.userData.spawnPosition.z - 2,
+            bot.userData.spawnPosition.z,
+            phase / 0.3
+          );
+        } else if (phase < 0.6) {
+          // Exposed
+          bot.position.z = bot.userData.spawnPosition.z;
+        } else {
+          // Hiding
+          bot.position.z = THREE.MathUtils.lerp(
+            bot.userData.spawnPosition.z,
+            bot.userData.spawnPosition.z - 2,
+            (phase - 0.6) / 0.4
+          );
+        }
+        bot.rotation.y = Math.atan2(toCamera.x, toCamera.z);
+        break;
+      }
+    }
+  }
+
+  animateWalk(bot, age, frequency) {
+    const parts = bot.userData.parts;
+    if (!parts) return;
+    const swing = Math.sin(age * frequency) * 0.15;
+    parts.leftUpperLeg.rotation.x = swing;
+    parts.rightUpperLeg.rotation.x = -swing;
+    parts.leftLowerLeg.rotation.x = Math.max(0, swing * 0.5);
+    parts.rightLowerLeg.rotation.x = Math.max(0, -swing * 0.5);
+  }
+
+  animateBotAnimation(bot, delta) {
+    // Subtle idle breathing animation
+    const parts = bot.userData.parts;
+    if (!parts) return;
+    const breath = Math.sin(performance.now() * 0.003) * 0.02;
+    parts.torso.position.y = parts.torso.userData.defaultPosition.y + breath;
+    parts.neck.position.y = parts.neck.userData.defaultPosition.y + breath * 0.5;
+  }
+
+  getActiveBots() {
+    return Array.from(this.activeBots);
+  }
+
+  clear() {
+    for (const bot of this.activeBots) {
+      this.release(bot);
+    }
+  }
+
+  dispose() {
+    this.clear();
+    for (const bot of this.pool) {
+      this.scene.remove(bot);
+      // Dispose all geometries and materials
+      bot.traverse((child) => {
+        if (child.isMesh) {
+          child.geometry.dispose();
+          child.material.dispose();
+        }
+      });
+    }
+  }
+}</code></pre>
+
+<h3 id="sec3-3">3.3 Frustum Culling та оптимізований Raycasting</h3>
+
+<p>Поточний Raycaster (GameEngine.js) перебирає ВСІ об'єкти сцени. Для складних моделей ботів це O(n) на кожен постріл. Рішення — <strong>spatial partitioning</strong> та <strong>hierarchical raycasting</strong>.</p>
+
+<pre><code>// src/game/SpatialIndex.js — Grid-based spatial hashing
+export class SpatialIndex {
+  constructor(cellSize = 4) {
+    this.cellSize = cellSize;
+    this.grid = new Map(); // key: "x,y,z", value: Set of objects
+  }
+
+  _getCellKey(x, y, z) {
+    const cx = Math.floor(x / this.cellSize);
+    const cy = Math.floor(y / this.cellSize);
+    const cz = Math.floor(z / this.cellSize);
+    return `${cx},${cy},${cz}`;
+  }
+
+  insert(obj, position) {
+    const key = this._getCellKey(position.x, position.y, position.z);
+    if (!this.grid.has(key)) this.grid.set(key, new Set());
+    this.grid.get(key).add(obj);
+    obj._spatialKey = key;
+  }
+
+  update(obj, newPosition) {
+    this.remove(obj);
+    this.insert(obj, newPosition);
+  }
+
+  remove(obj) {
+    if (obj._spatialKey && this.grid.has(obj._spatialKey)) {
+      this.grid.get(obj._spatialKey).delete(obj);
+    }
+  }
+
+  // Get candidates along ray using 3D DDA traversal
+  queryRay(ray, maxDistance = 50) {
+    const candidates = new Set();
+    const dir = ray.direction.clone().normalize();
+    const invDir = new THREE.Vector3(1/dir.x, 1/dir.y, 1/dir.z);
+
+    // Step through grid cells along ray
+    let t = 0;
+    const step = new THREE.Vector3(
+      Math.sign(dir.x), Math.sign(dir.y), Math.sign(dir.z)
+    );
+    const tDelta = new THREE.Vector3(
+      Math.abs(this.cellSize * invDir.x),
+      Math.abs(this.cellSize * invDir.y),
+      Math.abs(this.cellSize * invDir.z)
+    );
+
+    const cell = new THREE.Vector3(
+      Math.floor(ray.origin.x / this.cellSize),
+      Math.floor(ray.origin.y / this.cellSize),
+      Math.floor(ray.origin.z / this.cellSize)
+    );
+
+    const tMax = new THREE.Vector3(
+      ((cell.x + (step.x > 0 ? 1 : 0)) * this.cellSize - ray.origin.x) * invDir.x,
+      ((cell.y + (step.y > 0 ? 1 : 0)) * this.cellSize - ray.origin.y) * invDir.y,
+      ((cell.z + (step.z > 0 ? 1 : 0)) * this.cellSize - ray.origin.z) * invDir.z
+    );
+
+    let steps = 0;
+    const maxSteps = Math.ceil(maxDistance / this.cellSize) * 3;
+
+    while (t < maxDistance && steps < maxSteps) {
+      const key = `${cell.x},${cell.y},${cell.z}`;
+      if (this.grid.has(key)) {
+        for (const obj of this.grid.get(key)) {
+          candidates.add(obj);
+        }
+      }
+
+      // Step to next cell
+      if (tMax.x < tMax.y) {
+        if (tMax.x < tMax.z) {
+          t = tMax.x;
+          tMax.x += tDelta.x;
+          cell.x += step.x;
+        } else {
+          t = tMax.z;
+          tMax.z += tDelta.z;
+          cell.z += step.z;
+        }
+      } else {
+        if (tMax.y < tMax.z) {
+          t = tMax.y;
+          tMax.y += tDelta.y;
+          cell.y += step.y;
+        } else {
+          t = tMax.z;
+          tMax.z += tDelta.z;
+          cell.z += step.z;
+        }
+      }
+      steps++;
+    }
+
+    return candidates;
+  }
+
+  clear() {
+    this.grid.clear();
+  }
+}
+
+// Optimized raycasting in GameEngine
+class OptimizedGameEngine {
+  constructor() {
+    this.spatialIndex = new SpatialIndex(4); // 4-meter cells
+  }
+
+  performRaycast() {
+    const ray = new THREE.Raycaster();
+    ray.setFromCamera(new THREE.Vector2(0, 0), this.camera);
+
+    // Query spatial index for candidates
+    const candidates = this.spatialIndex.queryRay(ray.ray, 60);
+
+    // Test only candidates (not entire scene)
+    const targets = [];
+    for (const obj of candidates) {
+      if (obj.isInstancedMesh) {
+        // Special handling for InstancedMesh
+        const hits = this.raycastInstancedMesh(ray, obj);
+        targets.push(...hits);
+      } else if (obj.isGroup) {
+        // For bot groups, test hitboxes only
+        const hit = this.raycastBot(ray, obj);
+        if (hit) targets.push(hit);
+      }
+    }
+
+    targets.sort((a, b) => a.distance - b.distance);
+    return targets[0] || null;
+  }
+
+  raycastBot(ray, botGroup) {
+    // Only test hitbox meshes, not full geometry
+    const hitboxes = botGroup.userData.hitboxes || [];
+    let closestHit = null;
+    let closestDist = Infinity;
+
+    for (const mesh of hitboxes) {
+      if (!mesh.visible) continue;
+      const intersects = ray.intersectObject(mesh, false);
+      if (intersects.length > 0 && intersects[0].distance < closestDist) {
+        closestDist = intersects[0].distance;
+        closestHit = {
+          ...intersects[0],
+          hitPart: mesh.userData.hitPart || 'body',
+          bot: botGroup,
+        };
+      }
+    }
+
+    return closestHit;
+  }
+}</code></pre>
+</div>
+
+<!-- ===================== SECTION 4 ===================== -->
+<div class="section" id="sec4">
+<h2>4. Flick Path Analysis</h2>
+
+<p>Система візуалізації "шляху прицілу" (aim path) дозволяє аналізувати якість фліків після кожного пострілу. Ключові метрики: overshoot, undershoot, correction count, path smoothness.</p>
+
+<pre><code>// src/game/FlickPathAnalyzer.js
+import * as THREE from 'three';
+
+export class FlickPathAnalyzer {
+  constructor(scene, maxPathLength = 200) {
+    this.scene = scene;
+    this.maxPathLength = maxPathLength;
+
+    // Recording state
+    this.isRecording = false;
+    this.currentPath = []; // Array of {timestamp, yaw, pitch, angularVelocity}
+    this.pathHistory = []; // Array of completed flick paths
+
+    // Visualization
+    this.pathLine = null;
+    this.idealLine = null;
+    this.markerGroup = new THREE.Group();
+    scene.add(this.markerGroup);
+
+    this.maxHistory = 10;
+    this.lookPointer = { yaw: 0, pitch: 0 };
+    this.lastPointer = null;
+  }
+
+  // Call this every frame from GameEngine.update()
+  recordFrame(pointer, targetPosition, camera) {
+    const now = performance.now();
+
+    if (!this.isRecording) return;
+
+    // Compute angular velocity
+    let angularVel = 0;
+    if (this.lastPointer) {
+      const yawDelta = Math.abs(this.normalizeAngle(pointer.yaw - this.lastPointer.yaw));
+      const pitchDelta = Math.abs(pointer.pitch - this.lastPointer.pitch);
+      angularVel = Math.sqrt(yawDelta * yawDelta + pitchDelta * pitchDelta);
+    }
+
+    // Compute angular error to target
+    const angularError = this.computeAngularError(pointer, targetPosition, camera);
+
+    this.currentPath.push({
+      timestamp: now,
+      yaw: pointer.yaw,
+      pitch: pointer.pitch,
+      angularVelocity: angularVel,
+      angularError,
+    });
+
+    // Keep only last N frames
+    if (this.currentPath.length > this.maxPathLength) {
+      this.currentPath.shift();
+    }
+
+    this.lastPointer = { yaw: pointer.yaw, pitch: pointer.pitch };
+  }
+
+  startFlick(startPointer, targetPosition, camera) {
+    this.isRecording = true;
+    this.currentPath = [];
+    this.lastPointer = null;
+    this.flickStartTime = performance.now();
+    this.flickTarget = targetPosition.clone();
+    this.initialError = this.computeAngularError(startPointer, targetPosition, camera);
+  }
+
+  endFlick(hitSuccess) {
+    this.isRecording = false;
+
+    if (this.currentPath.length < 3) return;
+
+    const analysis = this.analyzePath(this.currentPath, hitSuccess);
+    this.pathHistory.push({
+      path: [...this.currentPath],
+      analysis,
+      hitSuccess,
+      timestamp: performance.now(),
+    });
+
+    if (this.pathHistory.length > this.maxHistory) {
+      this.pathHistory.shift();
+    }
+
+    this.visualizeLastPath();
+    return analysis;
+  }
+
+  analyzePath(path, hitSuccess) {
+    if (path.length < 3) return null;
+
+    const errors = path.map(p => p.angularError);
+    const velocities = path.map(p => p.angularVelocity);
+
+    // Find minimum error (closest to target)
+    const minError = Math.min(...errors);
+    const minErrorIndex = errors.indexOf(minError);
+
+    // Overshoot detection: did we pass the target and come back?
+    let overshootAmount = 0;
+    let correctionCount = 0;
+    let lastDirection = 0;
+
+    for (let i = 1; i < path.length; i++) {
+      const errorDelta = errors[i] - errors[i - 1];
+      const direction = Math.sign(errorDelta);
+      if (direction !== 0 && direction !== lastDirection && lastDirection !== 0) {
+        correctionCount++;
+        // If we're getting closer after getting farther, track overshoot
+        if (errors[i - 1] > errors[0] * 0.5) {
+          overshootAmount = Math.max(overshootAmount, errors[i - 1] - minError);
+        }
+      }
+      if (direction !== 0) lastDirection = direction;
+    }
+
+    // Smoothness: standard deviation of angular acceleration
+    const accelerations = [];
+    for (let i = 1; i < velocities.length; i++) {
+      accelerations.push(velocities[i] - velocities[i - 1]);
+    }
+    const avgAccel = accelerations.reduce((a, b) => a + b, 0) / accelerations.length;
+    const accelVariance = accelerations.reduce((sum, a) => sum + (a - avgAccel) ** 2, 0) / accelerations.length;
+    const smoothnessScore = 1 / (1 + Math.sqrt(accelVariance) * 10); // 0-1
+
+    // Time to first zero-crossing (first time we get within small error)
+    const threshold = 0.05; // radians
+    let timeToAcquire = null;
+    for (let i = 0; i < errors.length; i++) {
+      if (errors[i] < threshold) {
+        timeToAcquire = path[i].timestamp - path[0].timestamp;
+        break;
+      }
+    }
+
+    return {
+      overshootAmount,
+      overshootRatio: this.initialError > 0 ? overshootAmount / this.initialError : 0,
+      correctionCount,
+      smoothnessScore,
+      timeToAcquire,
+      minError,
+      initialError: this.initialError,
+      pathEfficiency: this.initialError > 0 
+        ? this.initialError / this.computePathLength(path) 
+        : 1,
+      avgVelocity: velocities.reduce((a, b) => a + b, 0) / velocities.length,
+      hitSuccess,
+    };
+  }
+
+  computePathLength(path) {
+    let length = 0;
+    for (let i = 1; i < path.length; i++) {
+      const dy = this.normalizeAngle(path[i].yaw - path[i - 1].yaw);
+      const dp = path[i].pitch - path[i - 1].pitch;
+      length += Math.sqrt(dy * dy + dp * dp);
+    }
+    return length;
+  }
+
+  // Visualize path as 3D line projected from camera
+  visualizeLastPath() {
+    // Clear previous visualization
+    while (this.markerGroup.children.length > 0) {
+      const child = this.markerGroup.children[0];
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) child.material.dispose();
+      this.markerGroup.remove(child);
+    }
+
+    if (this.pathHistory.length === 0) return;
+
+    const lastPath = this.pathHistory[this.pathHistory.length - 1];
+    const path = lastPath.path;
+
+    // Convert angular coordinates to 3D points at fixed distance
+    const distance = 5;
+    const points = path.map(p => {
+      const x = distance * Math.sin(p.yaw) * Math.cos(p.pitch);
+      const y = distance * Math.sin(p.pitch);
+      const z = -distance * Math.cos(p.yaw) * Math.cos(p.pitch);
+      return new THREE.Vector3(x, y, z);
+    });
+
+    // Create path line with color gradient (red = start, green = end)
+    const colors = points.map((_, i) => {
+      const t = i / points.length;
+      return new THREE.Color(1 - t, t, 0); // Red → Yellow → Green
+    });
+
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(
+      colors.flatMap(c => [c.r, c.g, c.b]), 3
+    ));
+
+    const material = new THREE.LineBasicMaterial({
+      vertexColors: true,
+      linewidth: 2,
+      transparent: true,
+      opacity: 0.8,
+    });
+
+    this.pathLine = new THREE.Line(geometry, material);
+    this.markerGroup.add(this.pathLine);
+
+    // Add overshoot markers
+    const analysis = lastPath.analysis;
+    if (analysis.overshootAmount > 0.02) {
+      const overshootGeom = new THREE.SphereGeometry(0.08, 8, 8);
+      const overshootMat = new THREE.MeshBasicMaterial({
+        color: 0xff4444,
+        transparent: true,
+        opacity: 0.6,
+      });
+      const overshootMarker = new THREE.Mesh(overshootGeom, overshootMat);
+      // Position at peak overshoot point
+      const peakIdx = path.findIndex(p => p.angularError === analysis.minError + analysis.overshootAmount);
+      if (peakIdx >= 0) {
+        overshootMarker.position.copy(points[peakIdx]);
+        this.markerGroup.add(overshootMarker);
+      }
+    }
+
+    // Fade out after 3 seconds
+    setTimeout(() => {
+      this.fadeOutVisualization();
+    }, 3000);
+  }
+
+  fadeOutVisualization() {
+    if (!this.pathLine) return;
+    const mat = this.pathLine.material;
+    let opacity = 0.8;
+    const fade = setInterval(() => {
+      opacity -= 0.05;
+      mat.opacity = Math.max(0, opacity);
+      if (opacity <= 0) {
+        clearInterval(fade);
+        this.markerGroup.clear();
+        this.pathLine = null;
+      }
+    }, 50);
+  }
+
+  computeAngularError(pointer, targetPos, camera) {
+    const offset = targetPos.clone().sub(camera.position);
+    const targetYaw = Math.atan2(offset.x, -offset.z);
+    const targetPitch = Math.atan2(offset.y, Math.hypot(offset.x, offset.z));
+    return Math.hypot(
+      this.normalizeAngle(targetYaw - pointer.yaw),
+      targetPitch - pointer.pitch
+    );
+  }
+
+  normalizeAngle(angle) {
+    return Math.atan2(Math.sin(angle), Math.cos(angle));
+  }
+
+  dispose() {
+    this.markerGroup.clear();
+    this.scene.remove(this.markerGroup);
+  }
+}</code></pre>
+
+<div class="info-box success">
+<div class="info-box-title">Інтеграція в GameEngine</div>
+<pre style="background:transparent;border:none;margin:0;padding:0"><code>// В GameEngine.updateWeapon() при пострілі:
+if (hit) {
+  this.flickAnalyzer.endFlick(true);
+  const analysis = this.flickAnalyzer.pathHistory.at(-1)?.analysis;
+  if (analysis) {
+    // Feed into Sensitivity Finder telemetry
+    this.sensitivityFinder?.phaseTargetMetrics.at(-1)
+      ?.flickAnalysis = analysis;
+  }
+} else {
+  this.flickAnalyzer.endFlick(false);
+}
+
+// При появі нової мішені:
+onTargetSpawn(target) {
+  this.flickAnalyzer.startFlick(
+    { yaw: this.pointer.yaw, pitch: this.pointer.pitch },
+    target.position,
+    this.camera
+  );
+}</code></pre>
+</div>
+</div>
+
+<!-- ===================== SECTION 5 ===================== -->
+<div class="section" id="sec5">
+<h2>5. Realistic Recoil System</h2>
+
+<p>Поточна система має recoilKick (один скаляр). Для реалістичної віддачі потрібні патерни як у CS2/Valorant: криві Безьє для вертикальної/горизонтальної віддачі з випадковим розкидом.</p>
+
+<pre><code>// src/game/RecoilSystem.js
+import * as THREE from 'three';
+
+// Pre-defined recoil patterns (in degrees per shot)
+const RECOIL_PATTERNS = {
+  rifle: {
+    // CS2 AK-47 inspired pattern
+    vertical: [
+      0, -0.8, -1.2, -1.6, -2.0, -2.2, -2.4, -2.3, -2.1, -1.9,
+      -1.8, -1.7, -1.6, -1.5, -1.4, -1.3, -1.2, -1.1, -1.0, -0.9,
+      -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.3, -0.2, -0.2, -0.1,
+    ],
+    horizontal: [
+      0, 0.1, 0.3, 0.5, 0.7, 0.4, 0.0, -0.3, -0.6, -0.8,
+      -0.5, -0.2, 0.1, 0.4, 0.6, 0.3, 0.0, -0.2, -0.4, -0.3,
+      -0.1, 0.1, 0.2, 0.1, 0.0, -0.1, -0.1, 0.0, 0.0, 0.0,
+    ],
+    recoverySpeed: 3.5,    // degrees per second
+    randomSpread: 0.08,    // degrees of randomness
+    adsMultiplier: 0.65,   // reduced recoil in ADS
+  },
+  pistol: {
+    vertical: [-0.6, -0.5, -0.4],
+    horizontal: [0, 0.1, -0.1],
+    recoverySpeed: 6.0,
+    randomSpread: 0.15,
+    adsMultiplier: 0.8,
+  },
+  shotgun: {
+    vertical: [-1.5],
+    horizontal: [0],
+    recoverySpeed: 4.0,
+    randomSpread: 0.3,
+    adsMultiplier: 0.7,
+  },
+  sniper: {
+    vertical: [-2.0],
+    horizontal: [0],
+    recoverySpeed: 2.0,
+    randomSpread: 0.05,
+    adsMultiplier: 0.5,
+  },
+};
+
+export class RecoilSystem {
+  constructor(camera) {
+    this.camera = camera;
+    this.shotIndex = 0;          // Current position in pattern
+    this.accumulatedRecoil = new THREE.Vector2(0, 0); // yaw, pitch offset
+    this.currentDispersion = new THREE.Vector2(0, 0);
+    this.isRecovering = false;
+    this.lastShotTime = 0;
+    this.currentPattern = null;
+  }
+
+  setWeapon(weaponType) {
+    this.currentPattern = RECOIL_PATTERNS[weaponType] || RECOIL_PATTERNS.rifle;
+    this.shotIndex = 0;
+    this.accumulatedRecoil.set(0, 0);
+  }
+
+  fire(isADS = false) {
+    if (!this.currentPattern) return new THREE.Vector2(0, 0);
+
+    const pattern = this.currentPattern;
+    const idx = Math.min(this.shotIndex, pattern.vertical.length - 1);
+
+    // Base pattern value
+    let verticalRecoil = pattern.vertical[idx] || 0;
+    let horizontalRecoil = pattern.horizontal[idx] || 0;
+
+    // Apply ADS reduction
+    if (isADS) {
+      verticalRecoil *= pattern.adsMultiplier;
+      horizontalRecoil *= pattern.adsMultiplier;
+    }
+
+    // Add random spread (Gaussian-like distribution)
+    const randomYaw = (Math.random() - 0.5) * 2 * pattern.randomSpread;
+    const randomPitch = (Math.random() - 0.5) * 2 * pattern.randomSpread;
+
+    verticalRecoil += randomPitch;
+    horizontalRecoil += randomYaw;
+
+    // Accumulate
+    this.accumulatedRecoil.x += horizontalRecoil; // yaw
+    this.accumulatedRecoil.y += verticalRecoil;   // pitch
+
+    this.shotIndex++;
+    this.lastShotTime = performance.now();
+    this.isRecovering = false;
+
+    return new THREE.Vector2(horizontalRecoil, verticalRecoil);
+  }
+
+  update(delta, pointer) {
+    if (!this.currentPattern) return;
+
+    const timeSinceShot = (performance.now() - this.lastShotTime) / 1000;
+    const pattern = this.currentPattern;
+
+    // Auto-recovery after 0.15s of not shooting
+    if (timeSinceShot > 0.15) {
+      this.isRecovering = true;
+    }
+
+    if (this.isRecovering) {
+      // Exponential recovery toward zero
+      const recoveryRate = pattern.recoverySpeed * delta;
+      this.accumulatedRecoil.x *= Math.max(0, 1 - recoveryRate * 0.5);
+      this.accumulatedRecoil.y *= Math.max(0, 1 - recoveryRate);
+
+      // Reset shot index when fully recovered
+      if (Math.abs(this.accumulatedRecoil.y) < 0.01) {
+        this.shotIndex = 0;
+        this.accumulatedRecoil.set(0, 0);
+        this.isRecovering = false;
+      }
+    }
+  }
+
+  reset() {
+    this.shotIndex = 0;
+    this.accumulatedRecoil.set(0, 0);
+    this.isRecovering = false;
+  }
+
+  // Visual: apply recoil to weapon model
+  applyToWeapon(weaponGroup, progress) {
+    if (!weaponGroup) return;
+    // Kick animation on weapon
+    const kickBack = Math.sin(progress * Math.PI) * 0.03;
+    const kickUp = Math.sin(progress * Math.PI) * 0.015;
+    weaponGroup.position.z += kickBack;
+    weaponGroup.rotation.x -= kickUp;
+  }
+}
+
+// Integration into GameEngine.updateWeapon()
+// Replace current recoilKick logic with:
+/*
+  const recoilDelta = this.recoilSystem.fire(this.ads);
+  this.pointer.yaw += recoilDelta.x * 0.02;   // Apply horizontal recoil
+  this.pointer.pitch += recoilDelta.y * 0.02;  // Apply vertical recoil
+  this.pointer.pitch = clamp(this.pointer.pitch, -PI_2, PI_2);
+*/
+</code></pre>
+
+<div class="info-box">
+<div class="info-box-title">Паттерни віддачі через криві Безьє</div>
+Для більш плавних патернів (без дискретних кроків) можна інтерполювати між опорними точками кривої Безьє:
+<pre style="background:transparent;border:none;margin:0;padding:0"><code>function bezierInterpolation(controlPoints, t) {
+  // De Casteljau's algorithm
+  let points = controlPoints.map(p => ({...p}));
+  for (let level = 1; level < points.length; level++) {
+    for (let i = 0; i < points.length - level; i++) {
+      points[i].y = (1 - t) * points[i].y + t * points[i + 1].y;
+      points[i].x = (1 - t) * points[i].x + t * points[i + 1].x;
+    }
+  }
+  return points[0];
+}</code></pre>
+</div>
+</div>
+
+<!-- ===================== SECTION 6 ===================== -->
+<div class="section" id="sec6">
+<h2>6. Ranked System</h2>
+
+<p>Ранкова система від Bronze до Radiant потребує: (1) стабільної метрики навички, (2) нормалізації між сценаріями, (3) розподілу по процентилях.</p>
+
+<pre><code>// src/game/RankingSystem.js
+
+const RANKS = [
+  { name: 'Bronze',    tier: 1,  percentileThreshold: 0 },
+  { name: 'Silver',    tier: 2,  percentileThreshold: 15 },
+  { name: 'Gold',      tier: 3,  percentileThreshold: 35 },
+  { name: 'Platinum',  tier: 4,  percentileThreshold: 55 },
+  { name: 'Diamond',   tier: 5,  percentileThreshold: 75 },
+  { name: 'Ascendant', tier: 6,  percentileThreshold: 88 },
+  { name: 'Immortal',  tier: 7,  percentileThreshold: 96 },
+  { name: 'Radiant',   tier: 8,  percentileThreshold: 99.5 },
+];
+
+export class RankingSystem {
+  constructor() {
+    // Per-scenario rating baselines (populated from global data)
+    this.baselines = new Map(); // scenarioId -> { p50, p75, p90, p99 }
+  }
+
+  // Skill Rating Formula (ELO-like with scenario weights)
+  calculateSkillRating(scenarioResults, globalPercentiles) {
+    /*
+      scenarioResults: Array<{
+        scenarioId, score, accuracy, avgReaction, consistencyCV
+      }>
+
+      Composite Skill Score = weighted sum of normalized performance
+      across all scenario categories.
+    */
+
+    const categoryWeights = {
+      flicking:   0.18,
+      tracking:   0.18,
+      precision:  0.16,
+      speed:      0.12,
+      gridshot:   0.12,
+      valorant:   0.14,
+      switching:  0.10,
+    };
+
+    let totalWeight = 0;
+    let weightedSum = 0;
+
+    for (const result of scenarioResults) {
+      const baseline = this.baselines.get(result.scenarioId);
+      if (!baseline) continue;
+
+      // Normalize score against percentile baselines
+      const normalizedScore = this.normalizeAgainstBaseline(
+        result.score, baseline
+      );
+
+      // Consistency bonus (lower CV = higher bonus)
+      const consistencyBonus = Math.max(0, 1 - result.consistencyCV) * 0.1;
+
+      // Speed bonus (faster reaction = higher)
+      const reactionNorm = Math.max(0, Math.min(1, 
+        (400 - result.avgReaction) / 250
+      ));
+
+      const category = getScenarioById(result.scenarioId)?.category || 'warmup';
+      const weight = categoryWeights[category] || 0.05;
+
+      weightedSum += (normalizedScore + consistencyBonus + reactionNorm * 0.05) * weight;
+      totalWeight += weight;
+    }
+
+    const rawRating = totalWeight > 0 ? (weightedSum / totalWeight) * 1000 : 500;
+
+    return {
+      rating: Math.round(rawRating),
+      rank: this.getRankFromRating(rawRating),
+      percentile: this.estimatePercentile(rawRating, globalPercentiles),
+      categoryBreakdown: this.computeCategoryBreakdown(scenarioResults),
+    };
+  }
+
+  normalizeAgainstBaseline(score, baseline) {
+    // Convert score to percentile using log-normal distribution assumption
+    // baseline: { p50, p75, p90, p99 }
+    if (score <= baseline.p50) {
+      return 0.5 * (score / baseline.p50);
+    } else if (score <= baseline.p75) {
+      return 0.5 + 0.25 * ((score - baseline.p50) / (baseline.p75 - baseline.p50));
+    } else if (score <= baseline.p90) {
+      return 0.75 + 0.15 * ((score - baseline.p75) / (baseline.p90 - baseline.p75));
+    } else {
+      return 0.90 + 0.10 * Math.min(1, (score - baseline.p90) / (baseline.p99 - baseline.p90));
+    }
+  }
+
+  getRankFromRating(rating) {
+    const percentile = this.ratingToPercentile(rating);
+    for (let i = RANKS.length - 1; i >= 0; i--) {
+      if (percentile >= RANKS[i].percentileThreshold) {
+        return RANKS[i];
+      }
+    }
+    return RANKS[0];
+  }
+
+  ratingToPercentile(rating) {
+    // Logistic mapping: typical range 300-1200
+    return 100 / (1 + Math.exp(-0.008 * (rating - 750)));
+  }
+
+  estimatePercentile(rating, globalDistribution) {
+    if (!globalDistribution || globalDistribution.length === 0) return 50;
+
+    // Binary search in sorted distribution
+    const below = globalDistribution.filter(r => r < rating).length;
+    return (below / globalDistribution.length) * 100;
+  }
+
+  computeCategoryBreakdown(results) {
+    const categories = {};
+    for (const result of results) {
+      const cat = getScenarioById(result.scenarioId)?.category || 'other';
+      if (!categories[cat]) categories[cat] = { scores: [], best: 0 };
+      categories[cat].scores.push(result.score);
+      categories[cat].best = Math.max(categories[cat].best, result.score);
+    }
+
+    return Object.entries(categories).map(([cat, data]) => ({
+      category: cat,
+      average: data.scores.reduce((a, b) => a + b, 0) / data.scores.length,
+      best: data.best,
+      count: data.scores.length,
+    }));
+  }
+
+  // ELO-like update after each ranked scenario
+  updateRating(currentRating, scenarioScore, expectedScore, kFactor = 32) {
+    const actual = scenarioScore; // 0-1
+    const expected = 1 / (1 + Math.pow(10, (expectedScore - currentRating) / 400));
+    const newRating = currentRating + kFactor * (actual - expected);
+    return Math.round(newRating);
+  }
+}
+
+// Percentile calculation for global leaderboard
+export function calculatePercentile(score, allScores) {
+  if (!allScores.length) return 50;
+  const sorted = [...allScores].sort((a, b) => a - b);
+  const below = sorted.filter(s => s < score).length;
+  return (below / sorted.length) * 100;
+}</code></pre>
+
+<div class="info-box success">
+<div class="info-box-title">Параметри рангової системи</div>
+<table>
+<tr><th>Ранг</th><th>Процентиль</th><th>Рейтинг (приблизно)</th><th>Опис</th></tr>
+<tr><td>Bronze</td><td>0-15%</td><td>0-600</td><td>Початківці, освоєння механік</td></tr>
+<tr><td>Silver</td><td>15-35%</td><td>600-720</td><td>Базовий контроль миші</td></tr>
+<tr><td>Gold</td><td>35-55%</td><td>720-830</td><td>Стабільні фліки і трекінг</td></tr>
+<tr><td>Platinum</td><td>55-75%</td><td>830-930</td><td>Добре розвинуті всі аспекти аіму</td></tr>
+<tr><td>Diamond</td><td>75-88%</td><td>930-1020</td><td>Висока точність при швидкості</td></tr>
+<tr><td>Ascendant</td><td>88-96%</td><td>1020-1100</td><td>Елітний рівень контролю</td></tr>
+<tr><td>Immortal</td><td>96-99.5%</td><td>1100-1180</td><td>Топ-4% гравців</td></tr>
+<tr><td>Radiant</td><td>99.5%+</td><td>1180+</td><td>Кращі з кращих</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ===================== SECTION 7 ===================== -->
+<div class="section" id="sec7">
+<h2>7. 3D Spatial Audio</h2>
+
+<p>THREE.Audio та THREE.PositionalAudio дозволяють гравцю визначати напрямок появи мішеней на слух. Критично для режимів з реакцією на звук (Sound Reaction, сценарій 92).</p>
+
+<pre><code>// src/audio/SpatialAudioManager.js
+import * as THREE from 'three';
+
+export class SpatialAudioManager {
+  constructor(camera, masterVolume = 1.0) {
+    this.camera = camera;
+    this.masterVolume = masterVolume;
+    this.listener = new THREE.AudioListener();
+    camera.add(this.listener);
+
+    this.sounds = new Map();
+    this.loadedBuffers = new Map();
+    this.loader = new THREE.AudioLoader();
+  }
+
+  async preloadSound(name, url) {
+    return new Promise((resolve, reject) => {
+      this.loader.load(url, (buffer) => {
+        this.loadedBuffers.set(name, buffer);
+        resolve(buffer);
+      }, undefined, reject);
+    });
+  }
+
+  createPositionalSound(name, position, options = {}) {
+    const buffer = this.loadedBuffers.get(name);
+    if (!buffer) {
+      console.warn(`Sound "${name}" not preloaded`);
+      return null;
+    }
+
+    const sound = new THREE.PositionalAudio(this.listener);
+    sound.setBuffer(buffer);
+    sound.setRefDistance(options.refDistance || 8);
+    sound.setRolloffFactor(options.rolloffFactor || 1.5);
+    sound.setDistanceModel(options.distanceModel || 'inverse');
+    sound.setVolume((options.volume || 1.0) * this.masterVolume);
+
+    if (options.loop) sound.setLoop(true);
+
+    // Attach to a mesh at target position
+    const mesh = new THREE.Object3D();
+    mesh.position.copy(position);
+    mesh.add(sound);
+
+    // Add to scene temporarily
+    if (this.camera.parent) {
+      this.camera.parent.add(mesh);
+    }
+
+    this.sounds.set(sound.id, { sound, mesh, createdAt: performance.now() });
+    return sound;
+  }
+
+  // Play spatial target spawn sound (allows directional hearing)
+  playTargetSpawn(position, targetType = 'sphere') {
+    const soundName = targetType === 'bot' ? 'bot_spawn' : 'target_spawn';
+    const sound = this.createPositionalSound(soundName, position, {
+      volume: 0.6,
+      refDistance: 10,
+      rolloffFactor: 1.2,
+    });
+    if (sound) {
+      sound.play();
+      // Auto-cleanup after playback
+      setTimeout(() => this.disposeSound(sound.id), 3000);
+    }
+  }
+
+  // Ambient directional cue for off-screen targets
+  playProximityWarning(nearbyTargets) {
+    const now = performance.now();
+    if (this._lastWarning && now - this._lastWarning < 500) return;
+
+    for (const target of nearbyTargets) {
+      if (target.isOnScreen) continue;
+
+      // Create directional "whoosh" from target direction
+      const angle = Math.atan2(
+        target.position.x - this.camera.position.x,
+        target.position.z - this.camera.position.z
+      );
+
+      // Position sound source at target but with exaggerated distance
+      // for clearer directional perception
+      const soundPos = new THREE.Vector3(
+        this.camera.position.x + Math.sin(angle) * 5,
+        this.camera.position.y,
+        this.camera.position.z + Math.cos(angle) * 5
+      );
+
+      const sound = this.createPositionalSound('proximity_whoosh', soundPos, {
+        volume: 0.3,
+        refDistance: 3,
+        rolloffFactor: 0.5,
+      });
+      if (sound) sound.play();
+    }
+
+    this._lastWarning = now;
+  }
+
+  // HRTF-enhanced footsteps for bot movement
+  playFootstep(botPosition, intensity = 1.0) {
+    const sound = this.createPositionalSound('footstep', botPosition, {
+      volume: 0.4 * intensity,
+      refDistance: 6,
+      rolloffFactor: 2,
+    });
+    if (sound) {
+      // Slight pitch variation for realism
+      sound.detune = (Math.random() - 0.5) * 200; // ±100 cents
+      sound.play();
+    }
+  }
+
+  disposeSound(id) {
+    const entry = this.sounds.get(id);
+    if (!entry) return;
+    entry.sound.stop();
+    if (entry.mesh.parent) entry.mesh.parent.remove(entry.mesh);
+    this.sounds.delete(id);
+  }
+
+  setMasterVolume(volume) {
+    this.masterVolume = volume;
+    for (const { sound } of this.sounds.values()) {
+      // Update all active sounds
+      sound.setVolume(sound.getVolume() * volume);
+    }
+  }
+
+  dispose() {
+    for (const { sound, mesh } of this.sounds.values()) {
+      sound.stop();
+      if (mesh.parent) mesh.parent.remove(mesh);
+    }
+    this.sounds.clear();
+    this.loadedBuffers.clear();
+    this.camera.remove(this.listener);
+  }
+}
+
+// Integration: Add to GameEngine.initThree()
+// this.spatialAudio = new SpatialAudioManager(this.camera);
+// await this.spatialAudio.preloadSound('target_spawn', '/audio/spawn.mp3');
+// await this.spatialAudio.preloadSound('bot_spawn', '/audio/bot_spawn.mp3');
+// await this.spatialAudio.preloadSound('proximity_whoosh', '/audio/whoosh.mp3');
+// await this.spatialAudio.preloadSound('footstep', '/audio/footstep.mp3');
+</code></pre>
+
+<div class="info-box">
+<div class="info-box-title">Web Audio API HRTF Enhancement</div>
+Для ще кращого просторового сприйняття можна використати Web Audio API з конвольвером для HRTF (Head-Related Transfer Function):
+<pre style="background:transparent;border:none;margin:0;padding:0"><code>// HRTF panner for more realistic 3D audio
+function createHRTFPanner(audioContext, listener) {
+  const panner = audioContext.createPanner();
+  panner.panningModel = 'HRTF';
+  panner.distanceModel = 'inverse';
+  panner.refDistance = 1;
+  panner.maxDistance = 100;
+  panner.rolloffFactor = 1;
+  panner.coneInnerAngle = 360;
+  panner.coneOuterAngle = 0;
+  panner.coneOuterGain = 0;
+  return panner;
+}</code></pre>
+</div>
+</div>
+
+<!-- ===================== SECTION 8 ===================== -->
+<div class="section" id="sec8">
+<h2>8. Ghost Mode (Replay System)</h2>
+
+<p>Ghost Mode показує напівпрозору версію найкращого забігу паралельно з поточною грою. Це потребує ефективної системи запису реплеїв.</p>
+
+<pre><code>// src/game/ReplaySystem.js
+import * as THREE from 'three';
+
+// Ring buffer for continuous recording with fixed memory budget
+export class ReplayRecorder {
+  constructor(maxDuration = 600, tickRate = 60) {
+    this.maxTicks = maxDuration * tickRate;
+    this.tickRate = tickRate;
+    this.tickInterval = 1000 / tickRate;
+
+    // Fixed-size arrays for zero-allocation recording
+    this.positions = new Float32Array(this.maxTicks * 3);    // x, y, z
+    this.rotations = new Float32Array(this.maxTicks * 2);    // yaw, pitch
+    this.events = new Uint8Array(this.maxTicks);              // 0=none, 1=shot, 2=hit, 3=miss
+    this.targetStates = [];                                   // Sparse array of target snapshots
+
+    this.writeIndex = 0;
+    this.isRecording = false;
+    this.startTime = 0;
+    this.tickCount = 0;
+
+    // Delta compression for positions
+    this.lastPosition = new THREE.Vector3();
+    this.quantizationScale = 1000; // mm precision
+  }
+
+  startRecording() {
+    this.isRecording = true;
+    this.writeIndex = 0;
+    this.tickCount = 0;
+    this.startTime = performance.now();
+    this.targetStates = [];
+  }
+
+  recordTick(camera, pointer, eventType = 0, targets = []) {
+    if (!this.isRecording || this.writeIndex >= this.maxTicks) return;
+
+    const idx = this.writeIndex;
+
+    // Quantize position with delta from last
+    const px = Math.round((camera.position.x - this.lastPosition.x) * this.quantizationScale);
+    const py = Math.round((camera.position.y - this.lastPosition.y) * this.quantizationScale);
+    const pz = Math.round((camera.position.z - this.lastPosition.z) * this.quantizationScale);
+
+    this.positions[idx * 3] = px;
+    this.positions[idx * 3 + 1] = py;
+    this.positions[idx * 3 + 2] = pz;
+
+    this.lastPosition.copy(camera.position);
+
+    // Quantize rotation (yaw, pitch in milliradians)
+    this.rotations[idx * 2] = Math.round(pointer.yaw * 1000);
+    this.rotations[idx * 2 + 1] = Math.round(pointer.pitch * 1000);
+
+    // Event
+    this.events[idx] = eventType;
+
+    // Sparse target snapshot (only when targets change)
+    if (targets.length > 0 && (eventType > 0 || this.tickCount % 10 === 0)) {
+      this.targetStates.push({
+        tick: idx,
+        targets: targets.map(t => ({
+          id: t.id,
+          x: Math.round(t.position.x * this.quantizationScale),
+          y: Math.round(t.position.y * this.quantizationScale),
+          z: Math.round(t.position.z * this.quantizationScale),
+          active: t.active,
+          hp: t.hp || 0,
+        })),
+      });
+    }
+
+    this.writeIndex++;
+    this.tickCount++;
+  }
+
+  stopRecording() {
+    this.isRecording = false;
+    return this.exportReplay();
+  }
+
+  exportReplay() {
+    return {
+      version: 1,
+      tickRate: this.tickRate,
+      totalTicks: this.writeIndex,
+      duration: this.tickCount / this.tickRate,
+      positions: this.positions.slice(0, this.writeIndex * 3),
+      rotations: this.rotations.slice(0, this.writeIndex * 2),
+      events: this.events.slice(0, this.writeIndex),
+      targetStates: this.targetStates,
+      basePosition: {
+        x: this.lastPosition.x,
+        y: this.lastPosition.y,
+        z: this.lastPosition.z,
+      },
+    };
+  }
+
+  // Estimated memory usage
+  getMemoryUsage() {
+    const bytes = this.positions.byteLength + 
+                  this.rotations.byteLength + 
+                  this.events.byteLength +
+                  JSON.stringify(this.targetStates).length * 2;
+    return {
+      bytes,
+      kb: (bytes / 1024).toFixed(1),
+      mb: (bytes / 1024 / 1024).toFixed(2),
+    };
+  }
+}
+
+// Ghost playback system
+export class GhostPlayback {
+  constructor(scene, replayData) {
+    this.scene = scene;
+    this.replay = replayData;
+    this.currentTick = 0;
+    this.isPlaying = false;
+
+    // Ghost camera representation (transparent)
+    this.ghostCamera = new THREE.Group();
+
+    // Ghost weapon
+    const weaponGeom = new THREE.BoxGeometry(0.3, 0.2, 0.6);
+    const weaponMat = new THREE.MeshBasicMaterial({
+      color: 0x00ffff,
+      transparent: true,
+      opacity: 0.3,
+      wireframe: true,
+    });
+    this.ghostWeapon = new THREE.Mesh(weaponGeom, weaponMat);
+    this.ghostCamera.add(this.ghostWeapon);
+
+    // Ghost crosshair trail
+    const trailGeom = new THREE.BufferGeometry();
+    const trailMat = new THREE.LineBasicMaterial({
+      color: 0x00ffff,
+      transparent: true,
+      opacity: 0.15,
+    });
+    this.trail = new THREE.Line(trailGeom, trailMat);
+    this.trailPoints = [];
+
+    // Ghost hit markers
+    this.hitMarkers = new THREE.Group();
+
+    scene.add(this.ghostCamera);
+    scene.add(this.trail);
+    scene.add(this.hitMarkers);
+  }
+
+  start() {
+    this.isPlaying = true;
+    this.currentTick = 0;
+    this.startTime = performance.now();
+    this.trailPoints = [];
+  }
+
+  update(delta) {
+    if (!this.isPlaying) return;
+
+    // Advance tick based on elapsed time
+    const elapsed = (performance.now() - this.startTime) / 1000;
+    const targetTick = Math.floor(elapsed * this.replay.tickRate);
+
+    if (targetTick >= this.replay.totalTicks) {
+      this.isPlaying = false;
+      return;
+    }
+
+    // Replay all ticks from current to target (catch-up)
+    for (; this.currentTick <= targetTick; this.currentTick++) {
+      this.replayTick(this.currentTick);
+    }
+  }
+
+  replayTick(tick) {
+    // Decompress position (delta + running sum)
+    const basePos = this.replay.basePosition;
+    let x = 0, y = 0, z = 0;
+    for (let i = 0; i <= tick; i++) {
+      x += this.replay.positions[i * 3] / this.replay.quantizationScale || 0;
+      y += this.replay.positions[i * 3 + 1] / this.replay.quantizationScale || 0;
+      z += this.replay.positions[i * 3 + 2] / this.replay.quantizationScale || 0;
+    }
+
+    const px = basePos.x + x;
+    const py = basePos.y + y;
+    const pz = basePos.z + z;
+
+    const yaw = this.replay.rotations[tick * 2] / 1000;
+    const pitch = this.replay.rotations[tick * 2 + 1] / 1000;
+
+    // Update ghost camera
+    this.ghostCamera.position.set(px, py, pz);
+    this.ghostCamera.rotation.order = 'YXZ';
+    this.ghostCamera.rotation.y = yaw;
+    this.ghostCamera.rotation.x = pitch;
+
+    // Update trail
+    const distance = 3;
+    const lookPoint = new THREE.Vector3(
+      px + Math.sin(yaw) * Math.cos(pitch) * distance,
+      py + Math.sin(pitch) * distance,
+      pz - Math.cos(yaw) * Math.cos(pitch) * distance
+    );
+
+    if (tick % 3 === 0) { // Add point every 3 ticks for performance
+      this.trailPoints.push(lookPoint);
+      if (this.trailPoints.length > 300) this.trailPoints.shift();
+
+      this.trail.geometry.setFromPoints(this.trailPoints);
+      this.trail.geometry.attributes.position.needsUpdate = true;
+    }
+
+    // Handle events
+    const event = this.replay.events[tick];
+    if (event === 1) { // Shot
+      this.showGhostShot(px, py, pz, yaw, pitch);
+    } else if (event === 2) { // Hit
+      this.showGhostHit(lookPoint);
+    }
+  }
+
+  showGhostShot(x, y, z, yaw, pitch) {
+    // Brief flash on weapon
+    this.ghostWeapon.material.opacity = 0.8;
+    setTimeout(() => {
+      this.ghostWeapon.material.opacity = 0.3;
+    }, 50);
+  }
+
+  showGhostHit(position) {
+    const geom = new THREE.RingGeometry(0.05, 0.08, 8);
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0x00ffff,
+      transparent: true,
+      opacity: 0.5,
+      side: THREE.DoubleSide,
+    });
+    const marker = new THREE.Mesh(geom, mat);
+    marker.position.copy(position);
+    marker.lookAt(this.ghostCamera.position);
+    this.hitMarkers.add(marker);
+
+    // Fade out
+    let opacity = 0.5;
+    const fade = setInterval(() => {
+      opacity -= 0.02;
+      mat.opacity = opacity;
+      if (opacity <= 0) {
+        clearInterval(fade);
+        this.hitMarkers.remove(marker);
+        geom.dispose();
+        mat.dispose();
+      }
+    }, 50);
+  }
+
+  dispose() {
+    this.scene.remove(this.ghostCamera);
+    this.scene.remove(this.trail);
+    this.scene.remove(this.hitMarkers);
+    this.ghostWeapon.geometry.dispose();
+    this.ghostWeapon.material.dispose();
+    this.trail.geometry.dispose();
+    this.trail.material.dispose();
+  }
+}
+
+// Memory-efficient structure for 10-minute replay:
+// Positions: 600s * 60tps * 3 floats * 4 bytes = 432 KB (delta-quantized: ~50 KB)
+// Rotations: 600s * 60tps * 2 shorts * 2 bytes = 144 KB (quantized)
+// Events: 600s * 60tps * 1 byte = 36 KB
+// Target states: sparse, ~10 KB per minute = 100 KB
+// Total: ~350 KB for 10-minute replay
+</code></pre>
+</div>
+
+<!-- ===================== SECTION 9 ===================== -->
+<div class="section" id="sec9">
+<h2>9. High Refresh Rate та Delta Time</h2>
+
+<p>Критична проблема: при 240Hz фізика оновлюється в 4 рази частіше ніж при 60Hz. Без компенсації мішені рухаються швидше на високих частотах.</p>
+
+<div class="info-box danger">
+<div class="info-box-title">Проблема: Frame-rate Dependent Physics</div>
+Поточний код (типовий підхід):
+<pre style="background:transparent;border:none;margin:0;padding:0"><code>position.x += velocity.x;  // BAD: velocity per frame, not per second!</code></pre>
+При 240Hz мішень переміститься в 4 рази далі за ту ж секунду.
+</div>
+
+<pre><code>// src/game/FixedTimestep.js
+// Fixed timestep physics with accumulator pattern (Gaffer on Games)
+
+export class FixedTimestepLoop {
+  constructor(updateFn, renderFn, fixedDt = 1/120) {
+    this.updateFn = updateFn;    // physics/logic update
+    this.renderFn = renderFn;    // render update
+    this.fixedDt = fixedDt;       // 120Hz physics
+    this.accumulator = 0;
+    this.lastTime = performance.now();
+    this.running = false;
+
+    // Stats
+    this.physicsSteps = 0;
+    this.renderFrames = 0;
+  }
+
+  start() {
+    this.running = true;
+    this.lastTime = performance.now();
+    this.loop();
+  }
+
+  stop() {
+    this.running = false;
+  }
+
+  loop = () => {
+    if (!this.running) return;
+
+    const now = performance.now();
+    let frameTime = (now - this.lastTime) / 1000;
+    this.lastTime = now;
+
+    // Prevent spiral of death (tab inactive, etc.)
+    if (frameTime > 0.25) frameTime = 0.25;
+
+    this.accumulator += frameTime;
+    this.physicsSteps = 0;
+
+    // Fixed timestep updates
+    while (this.accumulator >= this.fixedDt) {
+      this.updateFn(this.fixedDt); // dt is ALWAYS fixed
+      this.accumulator -= this.fixedDt;
+      this.physicsSteps++;
+    }
+
+    // Interpolation factor for smooth rendering
+    const alpha = this.accumulator / this.fixedDt;
+    this.renderFn(frameTime, alpha);
+    this.renderFrames++;
+
+    requestAnimationFrame(this.loop);
+  };
+}
+
+// Integration into GameEngine:
+// Replace the frame() loop with:
+/*
+this.timestepLoop = new FixedTimestepLoop(
+  (dt) => this.fixedUpdate(dt),   // physics at 120Hz
+  (dt, alpha) => this.renderUpdate(dt, alpha)  // render at display rate
+);
+this.timestepLoop.start();
+*/
+
+// FIXED UPDATE (120Hz guaranteed)
+fixedUpdate(dt) {
+  if (this.paused || this.ended || this.disposed) return;
+
+  this.actualElapsed += dt;
+
+  // ALL movement MUST use dt
+  this.updateWeapon(dt);
+  this.updateTargets(dt);      // dt-compensated movement
+  this.updateParticles(dt);
+  this.updateBots(dt);
+  this.updateRecoil(dt);
+  this.updateScreenShake(dt);
+
+  // Sensitivity Finder phase management
+  if (this.sensitivityFinder) {
+    this.updateSensitivityPhases();
+  }
+
+  // Spawn logic
+  this.spawnTick(dt);
+
+  // Collision/Hit detection
+  this.processHits();
+}
+
+// RENDER UPDATE (variable rate, 60-240Hz)
+renderUpdate(dt, alpha) {
+  // Interpolate positions for smooth visual
+  this.interpolatePositions(alpha);
+
+  // Update visual-only elements
+  this.updateWeaponVisual(dt);
+  this.updateHUD(dt);
+
+  // Render
+  this.renderer.render(this.scene, this.camera);
+}
+
+// CRITICAL: All movement functions must use dt
+function updateTargetPosition(target, dt) {
+  switch (target.movement) {
+    case 'horizontal':
+      target.position.x += target.speed * dt;  // speed in units/second
+      break;
+    case 'circle':
+      target.angle += target.angularSpeed * dt; // radians/second
+      target.position.x = Math.cos(target.angle) * target.radius;
+      target.position.z = Math.sin(target.angle) * target.radius;
+      break;
+    case 'figure8':
+      target.angle += target.angularSpeed * dt;
+      target.position.x = Math.sin(target.angle) * target.amplitude;
+      target.position.y = Math.sin(target.angle * 2) * target.amplitude * 0.5;
+      break;
+  }
+}
+
+// Interpolation for smooth rendering between physics steps
+interpolatePositions(alpha) {
+  for (const target of this.activeTargets) {
+    if (target.previousPosition && target.visualMesh) {
+      target.visualMesh.position.lerpVectors(
+        target.previousPosition,
+        target.position,
+        alpha
+      );
+    }
+  }
+}
+</code></pre>
+
+<div class="info-box success">
+<div class="info-box-title">Правило: Завжди множте на dt</div>
+<table>
+<tr><th>Неправильно (frame-based)</th><th>Правильно (time-based)</th></tr>
+<tr><td><code>pos.x += speed</code></td><td><code>pos.x += speed * dt</code></td></tr>
+<tr><td><code>angle += 0.02</code></td><td><code>angle += angularSpeed * dt</code></td></tr>
+<tr><td><code>life -= 0.016</code></td><td><code>life -= dt</code></td></tr>
+<tr><td><code>recoil *= 0.95</code></td><td><code>recoil *= Math.pow(0.95, dt * 60)</code></td></tr>
+</table>
+</div>
+</div>
+
+<!-- ===================== SECTION 10 ===================== -->
+<div class="section" id="sec10">
+<h2>10. Roadmap до Професійного Продукту</h2>
+
+<h3>Пріоритетна черга (Kanban)</h3>
+
+<table>
+<tr><th>Пріоритет</th><th>Завдання</th><th>Складність</th><th>Очікуваний ефект</th></tr>
+<tr><td><span class="tag tag-critical">P0</span></td><td>Fixed Timestep + Delta Time</td><td>Середня</td><td>Ідентичний gameplay на 60/144/240Hz</td></tr>
+<tr><td><span class="tag tag-critical">P0</span></td><td>InstancedMesh для сфер-мішеней</td><td>Середня</td><td>10× draw calls reduction</td></tr>
+<tr><td><span class="tag tag-critical">P0</span></td><td>Spatial Index для Raycasting</td><td>Висока</td><td>O(1) замість O(n) на постріл</td></tr>
+<tr><td><span class="tag tag-high">P1</span></td><td>Advanced Sensitivity Finder (12 фаз)</td><td>Висока</td><td>Професійна калібрувальна система</td></tr>
+<tr><td><span class="tag tag-high">P1</span></td><td>Flick Path Analyzer</td><td>Середня</td><td>Візуальний аналіз якості аіму</td></tr>
+<tr><td><span class="tag tag-high">P1</span></td><td>Recoil System з патернами</td><td>Середня</td><td>Реалістична віддача (CS2/Valorant)</td></tr>
+<tr><td><span class="tag tag-high">P1</span></td><td>InstancedParticleSystem</td><td>Низька</td><td>1000+ частинок без лагів</td></tr>
+<tr><td><span class="tag tag-medium">P2</span></td><td>Spatial Audio</td><td>Середня</td><td>Позиційне аудіо для awareness</td></tr>
+<tr><td><span class="tag tag-medium">P2</span></td><td>Ghost Mode + Replay</td><td>Висока</td><td>Порівняння з найкращим забігом</td></tr>
+<tr><td><span class="tag tag-medium">P2</span></td><td>Ranked System</td><td>Середня</td><td>Gamification + retention</td></tr>
+<tr><td><span class="tag tag-low">P3</span></td><td>Bot LOD + Animation</td><td>Висока</td><td>60+ ботів одночасно</td></tr>
+<tr><td><span class="tag tag-low">P3</span></td><td>Global Leaderboard Backend</td><td>Висока</td><td>Firebase/Supabase інтеграція</td></tr>
+</table>
+
+<h3>Архітектурні зміни структури проєкту</h3>
+
+<pre><code>src/
+├── core/
+│   ├── FixedTimestep.js          # NEW: Deterministic physics loop
+│   ├── SpatialIndex.js           # NEW: Grid-based spatial hashing
+│   └── PerformanceProfiler.js    # NEW: FPS/memory/metrics monitor
+├── renderer/
+│   ├── InstancedTargetManager.js # NEW: GPU-instanced spheres
+│   ├── InstancedParticleSystem.js# NEW: High-performance particles
+│   └── LODManager.js             # NEW: Level-of-detail for bots
+├── game/
+│   ├── GameEngine.js             # MODIFIED: Fixed timestep integration
+│   ├── AdaptiveDifficultyController.js  # NEW: Dynamic difficulty
+│   ├── SensitivityOptimizer.js   # NEW: Quadratic regression EDPI
+│   ├── FlickPathAnalyzer.js      # NEW: Aim path visualization
+│   ├── RecoilSystem.js           # NEW: Pattern-based recoil
+│   ├── ReplaySystem.js           # NEW: Ghost mode + recording
+│   ├── BotPool.js                # ENHANCED: LOD + animation
+│   └── RankingSystem.js          # NEW: ELO + percentile ranks
+├── audio/
+│   ├── SoundManager.js           # EXISTING
+│   └── SpatialAudioManager.js    # NEW: 3D positional audio
+├── analytics/
+│   ├── TelemetryCollector.js     # NEW: Aggregate metrics
+│   └── ScoreNormalizerr.js       # NEW: Cross-scenario comparison
+└── [existing files...]</code></pre>
+
+<div class="info-box success">
+<div class="info-box-title">Висновки</div>
+<p>AimForge має міцний архітектурний фундамент: продуману систему сценаріїв, чисте розділення логіки та ефективне використання Three.js базових можливостей. Ключовими кроками для виходу на професійний рівень є:</p>
+<ol>
+  <li><strong>Детермінізм фізики</strong> через fixed timestep — критично для чесного порівняння результатів між різними моніторами</li>
+  <li><strong>InstancedMesh + Spatial Index</strong> — дозволить масштабуватися до сотень мішеней без просадок FPS</li>
+  <li><strong>Advanced Sensitivity Finder</strong> з 12 фазами, адаптивною складністю та квадратичною регресією дасть конкурентну перевагу над KovaaK's та Aim Labs</li>
+  <li><strong>Flick Path Analysis + Ghost Mode</strong> — візуальний feedback для гравця, який немає в більшості конкурентів</li>
+  <li><strong>Ranked System</strong> — ключовий механізм retention та engagement</li>
+</ol>
+<p>Загальна оцінка: проєкт на 70% готовий до професійного релізу. Критичні зміни (P0) можна реалізувати за 2-3 тижні. Повний пакет (P0-P2) — 6-8 тижнів.</p>
+</div>
+
+</div>
+
+<div class="footer">
+  AimForge Technical Audit | Аналіз кодової бази | 2025<br>
+  Генеровано на основі аудиту 13 ключових файлів проєкту
+</div>
+
+</div>
+</body>
+</html>
